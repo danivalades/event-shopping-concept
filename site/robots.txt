@@ -1,2 +1,17 @@
+# Link-preview bots may read pages so shared links show a card.
+# Search engines are blocked, and every response also carries
+# X-Robots-Tag: noindex, nofollow (see vercel.json).
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Slackbot-LinkExpanding
+Allow: /
+
 User-agent: *
 Disallow: /
