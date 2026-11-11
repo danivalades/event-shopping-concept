@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Case page looks</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/Inter-latin-400.woff2) format('woff2')}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/Inter-latin-500.woff2) format('woff2')}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/Inter-latin-600.woff2) format('woff2')}
+  :root{--serif:'Instrument Serif',Georgia,serif;--sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:#121212;font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  :focus-visible{outline:3px solid #1F4FD8;outline-offset:3px}
+
+  /* ---- overview page (neutral, not part of any look) ---- */
+  .banner{position:sticky;top:0;z-index:50;padding:13px 12px;background:#232120;border-bottom:1px solid #332F2C;font-size:clamp(8.5px,2.9vw,11.5px);line-height:19px;font-weight:400;color:#A69E95;letter-spacing:.01em;text-align:center;white-space:nowrap}
+  .nm{font-weight:600;color:#EDE8E2;margin-left:.3em;text-decoration:none}
+  .sep{margin:0 .6em}
+  .banner a.nm:hover{text-decoration:underline;text-underline-offset:3px}
+  .banner a.nm:focus-visible{outline:2px solid #EDE8E2;outline-offset:2px;border-radius:2px}
+  main{max-width:1400px;margin:0 auto;padding:40px 24px 72px}
+  h1.title{font-family:var(--serif);font-weight:400;font-size:44px;line-height:1.05;margin:0 0 10px;letter-spacing:-.015em}
+  .note{margin:0 0 10px;font-size:15px;line-height:1.55;color:#525252}
+  .jump{display:flex;flex-wrap:wrap;gap:6px 22px;margin:0 0 18px;font-size:15px}
+  .jump a{color:#121212;text-decoration:underline;text-underline-offset:3px;border-radius:2px}
+  h2.round{scroll-margin-top:64px;font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.1;margin:0 0 6px;letter-spacing:-.01em}
+  .round-intro{margin:0 0 24px;font-size:15px;line-height:1.55;color:#525252;max-width:70ch}
+  section.round-block{margin:0 0 56px}
+  .lede{margin:0 0 32px;font-size:16px;line-height:1.55;color:#525252;max-width:64ch}
+  .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px 28px}
+  .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+  @media (max-width:1100px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:700px){.grid,.grid.two{grid-template-columns:minmax(0,1fr)}h1.title{font-size:36px}main{padding:28px 16px 56px}}
+  .cell{position:relative}
+  .cell.open{grid-column:1/-1}
+  .toggle{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;background:transparent;cursor:zoom-in;z-index:2;border-radius:4px}
+  .cell.open .toggle{cursor:zoom-out}
+  .frame{position:relative;width:100%;overflow:hidden;border:1px solid #d9d9d9}
+  .canvas{position:absolute;left:0;top:0;width:1280px;height:800px;transform-origin:0 0;overflow:hidden;pointer-events:none}
+  .name{font-size:17px;font-weight:600;margin:14px 0 2px}
+  .use{font-size:14px;line-height:1.5;color:#525252;margin:0 0 10px}
+  .swatches{display:flex;flex-wrap:wrap;gap:8px 14px;margin:0;padding:0;list-style:none}
+  .swatches li{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#525252}
+  .swatches i{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.25);display:block}
+
+  /* ---- the mock: a fixed 1280x800 canvas, look set by variables ---- */
+  .mock{--bg:#fff;--ink:#121212;--soft:#6E6E6E;--line:#E8E6E3;--accent:#4A6B52;--bezel:#2A2826;--shadow:none;--bannerbg:#F6F5F3;--bannerline:#E8E6E3;
+    position:relative;width:1280px;height:800px;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
+  .mock .mb{height:30px;line-height:29px;text-align:center;background:var(--bannerbg);color:var(--soft);border-bottom:1px solid var(--bannerline);font-size:12px;font-weight:400;white-space:nowrap}
+  .mock .mb .nm,.mock .bn .nm{color:var(--ink);font-weight:600;margin-left:.3em}
+  .mock .wrap{position:relative;padding:0 64px}
+  .mock .hero{padding:52px 0 40px;position:relative}
+  .mock .eyebrow{font-size:12px;color:var(--accent);margin:0 0 16px}
+  .mock h1{font-family:var(--serif);font-weight:400;font-size:60px;line-height:1.04;letter-spacing:-.018em;margin:0 0 20px;max-width:760px;color:var(--ink)}
+  .mock .standfirst{font-size:16px;line-height:1.62;color:var(--soft);max-width:60ch;margin:0}
+  .mock .rule{width:40px;height:2px;background:var(--accent);margin:22px 0 0}
+  .mock .credit{margin-top:14px;font-size:13px;font-weight:600;color:var(--soft)}
+  .mock .stage{position:relative;display:grid;grid-template-columns:340px 1fr;gap:72px;align-items:start}
+  .mock .devcol{position:relative;z-index:1}
+  .mock .device{width:340px;padding:9px;border-radius:44px;background:var(--bezel);box-shadow:var(--shadow)}
+  .mock .device img{display:block;width:322px;height:auto;border-radius:36px;background:#fff}
+  .mock .foot{margin-top:14px;text-align:center;font-size:12px;color:var(--soft)}
+  .mock .foot u{color:var(--accent);text-underline-offset:3px}
+  .mock .copy{position:relative;max-width:620px}
+  .mock .copy h2{font-family:var(--serif);font-weight:400;font-size:27px;line-height:1.2;margin:0 0 14px;letter-spacing:-.01em;color:var(--ink)}
+  .mock .copy p{font-size:14.5px;line-height:1.72;color:var(--soft);margin:0 0 14px}
+
+  /* A current */
+  .mock[data-look="A"]{--bg:#1B1917;--ink:#EDE8E2;--soft:#A69E95;--line:#332F2C;--accent:#96AE97;--bezel:linear-gradient(168deg,#3A3633,#201E1C);--shadow:0 2px 0 rgba(255,255,255,.07) inset,0 40px 80px -30px rgba(0,0,0,.85);--bannerbg:#232120;--bannerline:#332F2C}
+  /* B light and quiet */
+  .mock[data-look="B"]{--bannerbg:#F6F5F3;--shadow:0 18px 40px -18px rgba(18,18,18,.28),0 2px 6px rgba(18,18,18,.08)}
+  .mock[data-look="B"] .copy{border-top:1px solid var(--line)}
+  .mock[data-look="B"] .copy h2{margin-top:22px}
+  /* C green stage */
+  .mock[data-look="C"]{--accent:#3F5C47;--bezel:#F4F3F1;--shadow:0 24px 50px -20px rgba(0,0,0,.45);--bannerbg:#F6F5F3}
+  .mock[data-look="C"] .field{position:absolute;z-index:0;left:-64px;top:-40px;bottom:0;width:440px;background:#3F5C47}
+  .mock[data-look="C"] .foot,.mock[data-look="C"] .foot u{color:#fff}
+  /* D grey paper */
+  .mock[data-look="D"]{--bg:#ECEBE8;--soft:#5E5E5E;--line:#DAD8D4;--shadow:0 22px 44px -18px rgba(18,18,18,.35),0 2px 6px rgba(18,18,18,.1);--bannerbg:#E2E0DC;--bannerline:#D3D1CC}
+  .mock[data-look="D"] .copy{background:#fff;border-radius:2px;padding:36px 40px 40px;max-width:700px;height:640px}
+  .mock[data-look="D"] .foot{color:#4f4f4f}
+  /* E softer dark; F, G, H, I are variations on it */
+  .mock[data-look="E"],.mock[data-look="F"],.mock[data-look="G"],.mock[data-look="H"],.mock[data-look="I"]{--bg:#1E2420;--ink:#E9ECE6;--soft:#A5AEA6;--line:#36403A;--accent:#96AE97;--bezel:#3A433D;--shadow:0 30px 60px -28px rgba(0,0,0,.7);--bannerbg:#262D28;--bannerline:#36403A}
+  .mock[data-look="E"] .copy,.mock[data-look="F"] .copy,.mock[data-look="G"] .copy,.mock[data-look="H"] .copy,.mock[data-look="I"] .copy{background:var(--panel,#262D28);border-radius:4px;padding:36px 40px 40px;max-width:700px;height:640px}
+  /* F cool slate */
+  .mock[data-look="F"]{--bg:#1A2022;--panel:#222A2D;--line:#333D41;--ink:#E8ECEE;--soft:#A3AEB3;--bezel:#384246;--bannerbg:#222A2D;--bannerline:#333D41}
+  /* G lifted green */
+  .mock[data-look="G"]{--bg:#2B332D;--panel:#343D36;--line:#46514A;--ink:#F1F3EE;--soft:#BAC3BB;--accent:#B5C9B6;--bezel:#4A554D;--bannerbg:#343D36;--bannerline:#46514A}
+  /* H light phone */
+  .mock[data-look="H"]{--bezel:#F1F0EE;--shadow:0 24px 50px -20px rgba(0,0,0,.55)}
+  /* I rose accent */
+  .mock[data-look="I"]{--accent:#C8A4A0}
+
+  /* banner options: font size is fixed on the desktop slice and container-scaled on the 375 strip */
+  .bn{display:block;padding:0 10px;text-align:center;white-space:nowrap;font-weight:400;height:var(--h);line-height:calc(var(--h) - var(--rule,1px));background:var(--bg);color:var(--soft);border-bottom:var(--rule,1px) solid var(--bd);font-size:var(--max)}
+  .bn .nm{color:var(--ink)}
+  .strip{width:375px;max-width:100%;container-type:inline-size;background:#1E2420;padding-bottom:18px;margin-top:12px}
+  .strip .bn{font-size:clamp(10px,var(--cq),var(--max))}
+  @media (max-width:340px){main{padding-left:12px;padding-right:12px}.bn{padding:0 4px}.bn .sep,.mock .bn .sep{margin:0 .45em}.strip .bn{font-size:clamp(9px,var(--cq),var(--max))}}
+  /* full-page mocks (round 4) */
+  .full .wrap{position:static}
+  .full .copy{height:auto!important;max-width:660px}
+  .full .copy section{margin:0 0 30px}
+  .full .copy h2{margin-top:0}
+  .full .bet{border-left:2px solid var(--accent);padding:4px 0 4px 20px;margin:0 0 22px}
+  .full .copy .bet p{font-family:var(--serif);font-size:17px;line-height:1.56;color:var(--ink);margin:0}
+  .full .copy p b{color:var(--ink);font-weight:500}
+  .full .foot-end{position:absolute;left:64px;right:64px;bottom:0;border-top:1px solid var(--line);padding:26px 0 30px;font-size:13px;line-height:1.7;color:var(--soft)}
+  .full .foot-end p{margin:0 0 6px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="banner">Portfolio concept by<a class="nm" href="https://danivalades.com">Daniela Valades</a><span class="sep">·</span>Not affiliated with ShopMy</div>
+<main>
+  <h1 class="title">Case page looks</h1>
+  <p class="note">Letters stay fixed so you can refer to them. Nothing here is on the live site.</p>
+  <nav class="jump" aria-label="Sections"><a href="#r4">Round 4</a><a href="#r3">Round 3</a><a href="#r2">Round 2</a><a href="#r1">Round 1</a></nav>
+  <p class="lede">Five whole-page looks for the case page, shown as the same top of the page so only ground, color and phone surround change. Select one to see it large.</p>
+  <section class="round-block" aria-labelledby="r4"><h2 class="round" id="r4">Round 4</h2>
+    <p class="round-intro">Banners 1 and 2 on the three favourite looks, shown on the full page.</p>
+    <div class="grid two" id="grid4"></div></section>
+  <section class="round-block" aria-labelledby="r3"><h2 class="round" id="r3">Round 3</h2>
+    <p class="round-intro">Four ways to make the top banner easier to see. Shown on the softer dark (E); the same idea carries to the others.</p>
+    <div class="grid" id="gridB"></div></section>
+  <section class="round-block" aria-labelledby="r2"><h2 class="round" id="r2">Round 2</h2>
+    <p class="round-intro">Staying in the dark family. A and E repeat for reference; F to I try a different ground, a lighter dark, a light phone, and a different accent.</p>
+    <div class="grid" id="grid2"></div></section>
+  <section class="round-block" aria-labelledby="r1"><h2 class="round" id="r1">Round 1</h2>
+    <p class="round-intro">Five looks, from today's dark page to a light one.</p>
+    <div class="grid" id="grid1"></div></section>
+</main>
+
+<script>
+(function () {
+  var CANVAS_W = 1280, CANVAS_H = 800;
+  var LOOKS = [
+    { letter: "A", name: "Current dark", use: "Baseline for comparison: the case page as it is today.",
+      desc: "Warm near-black ground, slightly lifted panels, sage links, graphite phone with a deep shadow.",
+      hex: ["#1B1917", "#232120", "#EDE8E2", "#A69E95", "#96AE97"] },
+    { letter: "B", name: "Light and quiet", use: "White page, hairlines, green only on links and one rule.",
+      desc: "White ground, near-black text, hairline between sections, dark graphite phone with a soft shadow.",
+      hex: ["#FFFFFF", "#121212", "#6E6E6E", "#E8E6E3", "#4A6B52"] },
+    { letter: "C", name: "Green stage", use: "One bold move: a green field behind a near-white phone, text stays on white.",
+      desc: "White page with a full-height muted green field behind a near-white phone, like a product shot.",
+      hex: ["#FFFFFF", "#121212", "#6E6E6E", "#3F5C47", "#F4F3F1"] },
+    { letter: "D", name: "Grey paper", use: "Hero on grey, case copy on one white panel, phone floating.",
+      desc: "Light grey ground, a single white panel holding the case copy, graphite phone floating with a shadow.",
+      hex: ["#ECEBE8", "#FFFFFF", "#121212", "#5E5E5E", "#4A6B52"] },
+    { letter: "E", name: "Softer dark", use: "Today's dark look, refined: green-tinted, not black.",
+      desc: "Green-tinted dark ground with a slightly lighter panel, sage links and a muted green-grey phone.",
+      hex: ["#1E2420", "#262D28", "#E9ECE6", "#A5AEA6", "#96AE97"] },
+    { letter: "F", name: "Cool slate", use: "A blue-grey dark instead of green-tinted, sage links kept.",
+      desc: "Cool blue-grey dark ground with a slightly lighter panel, sage links and a slate phone.",
+      hex: ["#1A2022", "#222A2D", "#E8ECEE", "#A3AEB3", "#96AE97", "#384246"] },
+    { letter: "G", name: "Lifted green", use: "A lighter, less black dark with a paler green accent.",
+      desc: "Mid-dark green ground, noticeably lighter than E, with a pale sage accent and a green-grey phone.",
+      hex: ["#2B332D", "#343D36", "#F1F3EE", "#BAC3BB", "#B5C9B6", "#4A554D"] },
+    { letter: "H", name: "Softer dark, light phone", use: "E's palette with a near-white phone so it reads as a product shot.",
+      desc: "Green-tinted dark ground as in E, with a near-white phone and a soft shadow.",
+      hex: ["#1E2420", "#262D28", "#E9ECE6", "#A5AEA6", "#96AE97", "#F1F0EE"] },
+    { letter: "I", name: "Softer dark, rose accent", use: "E's palette with a muted rose for links and the rule.",
+      desc: "Green-tinted dark ground as in E, with a muted rose accent on links and the one rule.",
+      hex: ["#1E2420", "#262D28", "#E9ECE6", "#A5AEA6", "#C8A4A0", "#3A433D"] }
+  ];
+  var ROUNDS = [
+    { grid: "grid1", letters: ["A", "B", "C", "D", "E"] },
+    { grid: "grid2", letters: ["A", "E", "F", "G", "H", "I"] }
+  ];
+  var BY_LETTER = {};
+  LOOKS.forEach(function (l) { BY_LETTER[l.letter] = l; });
+
+  var BANNER_TEXT = 'Portfolio concept by<span class="nm">Daniela Valades</span><span class="sep">·</span>Not affiliated with ShopMy';
+
+  function mockHTML(letter) {
+    return '' +
+      '<div class="mock" data-look="' + letter + '">' +
+      '<div class="mb">' + BANNER_TEXT + '</div>' +
+      '<div class="wrap">' +
+        '<header class="hero">' +
+          '<p class="eyebrow">Shopper experience concept</p>' +
+          '<h1>All your events in one place, and discovery that works for them.</h1>' +
+          '<p class="standfirst">A shopper experience concept for ShopMy, built from a wedding I had to dress for.</p>' +
+          '<div class="rule"></div><p class="credit">Daniela Valades · Product Builder Role, Shopper Experience · Nov 2026</p>' +
+        '</header>' +
+        '<div class="stage">' +
+          (letter === "C" ? '<div class="field"></div>' : '') +
+          '<div class="devcol"><div class="device"><img src="img/case-looks-phone.png" alt="" width="390" height="844"></div>' +
+          '<p class="foot">Live prototype · <u>open full screen</u></p></div>' +
+          '<div class="copy"><h2>Where it started</h2>' +
+          '<p>I had a black-tie wedding in Mexico City this fall, and a welcome party the night before. I needed a dress for each. By the time an event is close, looking through dresses is exhausting, so I ended up going in person.</p>' +
+          '<p>Online, finding anything interesting means going through my favorite creators and scrolling for a long time. Otherwise I end up buying from a big retailer, and I don\'t want that to be my go-to every time. I want to reliably find cool things that fit the occasion.</p>' +
+          '<p>You usually know about an event months ahead. That\'s a long runway nobody uses. The shopping could be a fun scroll in front of a TV show, with options saved, until something clicks.</p></div>' +
+        '</div>' +
+      '</div></div>';
+  }
+
+  var BANNERS = [
+    { n: 1, name: "Lifted strip", use: "A lighter green-grey strip with full-contrast text.", max: 13, h: 40, rule: "1px",
+      bg: "#333C36", bd: "#46514A", ink: "#E9ECE6", soft: "#E9ECE6", hex: ["#333C36", "#46514A", "#E9ECE6"] },
+    { n: 2, name: "Paper strip", use: "Inverted against the dark page for maximum visibility.", max: 13, h: 40, rule: "1px",
+      bg: "#E9ECE6", bd: "#E9ECE6", ink: "#1E2420", soft: "#4A524C", hex: ["#E9ECE6", "#1E2420", "#4A524C"] },
+    { n: 3, name: "Sage strip", use: "The accent green as a solid strip, dark text.", max: 13, h: 40, rule: "1px",
+      bg: "#96AE97", bd: "#96AE97", ink: "#1E2420", soft: "#1E2420", hex: ["#96AE97", "#1E2420"] },
+    { n: 4, name: "Lifted strip with a sage rule", use: "Option 1, a touch larger, with a 2px sage line along the bottom edge.", max: 14, h: 44, rule: "2px",
+      bg: "#333C36", bd: "#96AE97", ink: "#E9ECE6", soft: "#E9ECE6", hex: ["#333C36", "#E9ECE6", "#96AE97"] }
+  ];
+  var BANNER_CQ = 2.9;
+
+  function bannerStyle(b) {
+    return "--bg:" + b.bg + ";--bd:" + b.bd + ";--ink:" + b.ink + ";--soft:" + b.soft + ";--h:" + b.h + "px;--rule:" + b.rule + ";--max:" + b.max + "px;--cq:" + b.cq + "cqw";
+  }
+  function bannerSliceHTML(b) {
+    return '<div class="mock" data-look="E" style="height:280px">' +
+      '<div class="bn" style="' + bannerStyle(b) + '">' + BANNER_TEXT + '</div>' +
+      '<div class="wrap"><header class="hero" style="padding-top:28px">' +
+      '<p class="eyebrow">Shopper experience concept</p>' +
+      '<h1>All your events in one place, and discovery that works for them.</h1>' +
+      '<p class="standfirst">A shopper experience concept for ShopMy, built from a wedding I had to dress for.</p>' +
+      '</header></div></div>';
+  }
+  function bannerStripHTML(b) {
+    return '<div class="strip mock-e"><div class="bn" style="' + bannerStyle(b) + '">' + BANNER_TEXT + '</div></div>';
+  }
+
+
+  var FULL_H = 1600;
+  var FULL_LOOKS = {
+    A: { ground: "#1B1917", ink: "#EDE8E2", accent: "#96AE97",
+         b1: { bg: "#3A3532", bd: "#4A4440", ink: "#EDE8E2", soft: "#EDE8E2" },
+         b2: { bg: "#EDE8E2", bd: "#EDE8E2", ink: "#1B1917", soft: "#5A524B" } },
+    E: { ground: "#1E2420", ink: "#E9ECE6", accent: "#96AE97" },
+    F: { ground: "#1A2022", ink: "#E8ECEE", accent: "#96AE97" }
+  };
+  var R3_B1 = { bg: "#333C36", bd: "#46514A", ink: "#E9ECE6", soft: "#E9ECE6" };
+  var R3_B2 = { bg: "#E9ECE6", bd: "#E9ECE6", ink: "#1E2420", soft: "#4A524C" };
+  var CASE_SECTIONS =
+    '<section><h2>Where it started</h2>' +
+    '<p>I had a black-tie wedding in Mexico City this fall, and a welcome party the night before. I needed a dress for each. By the time an event is close, looking through dresses is exhausting, so I ended up going in person.</p>' +
+    '<p>Online, finding anything interesting means going through my favorite creators and scrolling for a long time. Otherwise I end up buying from a big retailer, and I don\'t want that to be my go-to every time. I want to reliably find cool things that fit the occasion.</p>' +
+    '<p>You usually know about an event months ahead. That\'s a long runway nobody uses. The shopping could be a fun scroll in front of a TV show, with options saved, until something clicks.</p>' +
+    '<p>So the idea is all your events in one place, and discovery that works for them. From "I have a wedding in 4 months and I\'m panicking" to "good options keep accumulating for them."</p></section>' +
+    '<section><h2>What I found on the live app</h2>' +
+    '<p>I checked whether it was my problem or the product\'s. On ShopMy\'s public wedding pages, the occasion exists only as pixels. Creators publish collages captioned "Mother of the Bride" or "Chic Courthouse"; the title field says "Untitled Collection." Searching "wedding guest" returns about 370 results and nine collections, eight titled "Wedding Guest." A 6-product curation and a 107-product collection look identical.</p>' +
+    '<p>The shopper\'s real question is "September, Hudson Valley, black tie optional, I own the dress, $300 left." None of those five things exists in the interface.</p></section>' +
+    '<section><h2>The bet</h2><div class="bet"><p>Take the structure from the shopper, who already knows the date, place, formality and what she owns.</p></div>' +
+    '<p>The obvious fix is asking creators to tag their collections, a migration nobody will do. This way no creator changes anything, and existing collections become findable by occasion.</p>' +
+    '<p>A date also brings her back: ceremony, welcome party, brunch. As I understand it, ShopMy earns when purchases happen through creators\' recommendations, so a reason to return should matter.</p></section>';
+
+  function fullHTML(letter, n) {
+    var lk = FULL_LOOKS[letter];
+    var b = lk["b" + n] || (n === 1 ? R3_B1 : R3_B2);
+    var st = "--bg:" + b.bg + ";--bd:" + b.bd + ";--ink:" + b.ink + ";--soft:" + b.soft + ";--h:40px;--rule:1px;--max:13px";
+    return '<div class="mock full" data-look="' + letter + '" style="height:' + FULL_H + 'px">' +
+      '<div class="bn" style="' + st + '">' + BANNER_TEXT + '</div>' +
+      '<div class="wrap">' +
+        '<header class="hero">' +
+          '<p class="eyebrow">Shopper experience concept</p>' +
+          '<h1>All your events in one place, and discovery that works for them.</h1>' +
+          '<p class="standfirst">A shopper experience concept for ShopMy, built from a wedding I had to dress for.</p>' +
+          '<div class="rule"></div><p class="credit">Daniela Valades · Product Builder Role, Shopper Experience · Nov 2026</p>' +
+        '</header>' +
+        '<div class="stage">' +
+          '<div class="devcol"><div class="device"><img src="img/case-looks-phone.png" alt="" width="390" height="844"></div>' +
+          '<p class="foot">Live prototype · <u>open full screen</u></p></div>' +
+          '<div class="copy">' + CASE_SECTIONS + '</div>' +
+        '</div>' +
+        '<div class="foot-end"><p>An unsolicited concept, built because I\'d rather show you how I think than describe it. Daniela Valades — contact@danivalades.com</p><p>How the design came together</p></div>' +
+      '</div></div>';
+  }
+
+  var cells = [];
+  function makeCell(spec, grid) {
+    var cell = document.createElement("article");
+    cell.className = "cell";
+    cell.dataset.h = spec.h;
+    var label = spec.label + " Colors " + spec.hex.join(", ") + ". Select to show large.";
+    cell.innerHTML =
+      '<button type="button" class="toggle" aria-expanded="false"></button>' +
+      '<div aria-hidden="true">' +
+        '<div class="frame"><div class="canvas" inert>' + spec.canvas + '</div></div>' +
+        (spec.extra || '') +
+        '<p class="name">' + spec.title + '</p>' +
+        '<p class="use">' + spec.use + '</p>' +
+        '<ul class="swatches">' + spec.hex.map(function (h) {
+          return '<li><i style="background:' + h + '"></i>' + h + '</li>';
+        }).join("") + '</ul>' +
+      '</div>';
+    var btn = cell.querySelector(".toggle");
+    btn.setAttribute("aria-label", label);
+    btn.addEventListener("click", function () {
+      var open = !cell.classList.contains("open");
+      cell.classList.toggle("open", open);
+      btn.setAttribute("aria-expanded", String(open));
+      btn.setAttribute("aria-label", label.replace(/Select to (show large|return to the grid)\.$/, open ? "Select to return to the grid." : "Select to show large."));
+      rescale();
+    });
+    grid.appendChild(cell);
+    cells.push(cell);
+  }
+
+  BANNERS.forEach(function (b) {
+    b.cq = BANNER_CQ;
+    makeCell({
+      h: 280,
+      label: "Banner " + b.n + ", " + b.name + ". " + b.use,
+      title: "Banner " + b.n + " · " + b.name, use: b.use, hex: b.hex,
+      canvas: bannerSliceHTML(b), extra: bannerStripHTML(b)
+    }, document.getElementById("gridB"));
+  });
+  ROUNDS.forEach(function (round) {
+    var grid = document.getElementById(round.grid);
+    round.letters.forEach(function (l) {
+      var look = BY_LETTER[l];
+      makeCell({
+        h: CANVAS_H,
+        label: "Look " + look.letter + ", " + look.name + ". " + look.desc,
+        title: look.letter + ' · ' + look.name, use: look.use, hex: look.hex,
+        canvas: mockHTML(look.letter)
+      }, grid);
+    });
+  });
+
+  ["A", "E", "F"].forEach(function (l) {
+    [1, 2].forEach(function (n) {
+      var look = BY_LETTER[l], lk = FULL_LOOKS[l];
+      var b = lk["b" + n] || (n === 1 ? R3_B1 : R3_B2);
+      var bname = n === 1 ? "lifted strip" : "paper strip";
+      makeCell({
+        h: FULL_H,
+        label: "Look " + l + ", " + look.name + ", with banner " + n + ", the " + bname + ", on the full case page.",
+        title: l + " · " + look.name + ", banner " + n,
+        use: "Look " + l + " with the " + bname + ", on the full page.",
+        hex: [lk.ground, lk.ink, lk.accent, b.bg, b.soft],
+        canvas: fullHTML(l, n)
+      }, document.getElementById("grid4"));
+    });
+  });
+
+  function rescale() {
+    cells.forEach(function (cell) {
+      var frame = cell.querySelector(".frame");
+      var canvas = cell.querySelector(".canvas");
+      var h = +cell.dataset.h;
+      var scale = frame.clientWidth / CANVAS_W;
+      canvas.style.transform = "scale(" + scale + ")";
+      canvas.style.height = h + "px";
+      frame.style.height = (h * scale + 2) + "px";
+    });
+  }
+  window.addEventListener("resize", rescale);
+  rescale();
+})();
+</script>
+</body>
+</html>

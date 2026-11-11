@@ -1,0 +1,68 @@
+/* Shared by the process pages: frame system, grid, scaling, banner, page chrome */
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/Inter-latin-400.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/Inter-latin-500.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/Inter-latin-600.woff2) format('woff2')}
+:root{--ink:#121212;--soft:#5C5C5C;--faint:#707070;--line:#E8E6E3;--wash:#F6F4F2;--have:#4A6B52;
+--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;--serif:'Instrument Serif',Georgia,serif}
+*{box-sizing:border-box}
+body{margin:0;background:#EDEBE8;font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased}
+.cell{width:390px}
+.lbl{font-size:12px;font-weight:500;letter-spacing:.16em;margin:0 0 12px}
+.desc{font-size:13px;color:var(--soft);line-height:1.45;margin:12px 0 0}
+.frame{width:390px;height:844px;background:#fff;border:1px solid #D8D5D0;border-radius:28px;overflow:hidden;position:relative;pointer-events:none;user-select:none;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.inner{position:absolute;inset:0}
+h2,h3,p{margin:0}
+.disclaimer{position:sticky;top:0;z-index:60;padding:calc(13px + env(safe-area-inset-top,0px)) 10px 13px;background:#3A3532;border-bottom:1px solid #4A4440;font-size:clamp(10px,2.9vw,13px);line-height:19px;font-weight:400;color:#EDE8E2;letter-spacing:.01em;text-align:center;white-space:nowrap}
+.disclaimer .sep{margin:0 .6em}
+.disclaimer .nm{font-weight:600;color:#EDE8E2;margin-left:.3em}
+@media (max-width:340px){.disclaimer{padding-left:4px;padding-right:4px;font-size:9px}.disclaimer .sep{margin:0 .45em}}
+/* page chrome */
+.top{padding:36px 40px 4px;max-width:760px}
+.top h1{font-family:var(--sans);font-weight:500;font-size:18px;line-height:1.3;letter-spacing:.16em;text-transform:uppercase;margin:0 0 14px}
+.top p{margin:0 0 4px;font-size:14px;line-height:1.5;color:var(--soft)}
+.jump{display:flex;flex-wrap:wrap;gap:6px 16px;margin:14px 0 0;font-size:14px;color:var(--soft)}
+a{color:var(--ink)}
+a:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:2px}
+.round{padding:36px 40px 0;scroll-margin-top:48px}
+.round h2{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.1;margin:0 0 8px}
+.round>p{margin:0;max-width:640px;font-size:14px;line-height:1.55;color:var(--soft)}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(390px,1fr));gap:40px 24px;padding:24px 40px 40px;justify-items:center}
+.end{padding:8px 40px 56px;font-size:14px}
+.credits{padding:0 40px 56px;font-size:12px;line-height:1.55;color:var(--soft);max-width:760px}
+.credits a{color:var(--soft)}
+/* layout: three per row, frames scaled by --s (set by script, CSS fallback below) */
+:root{--s:.82;--pad:40px}
+@media(max-width:899px){:root{--s:.9;--pad:32px}}
+@media(max-width:599px){:root{--s:.88;--pad:16px}}
+.top,.round,.board,.end,.credits{padding-left:var(--pad);padding-right:var(--pad)}
+.top{padding-top:20px;padding-bottom:0}
+.top p{font-size:13.5px}
+.jump{margin-top:10px}
+.round{padding-top:24px;padding-bottom:0}
+.round h2{font-size:24px;margin-bottom:4px}
+.board{display:grid;grid-template-columns:repeat(3,calc(390px*var(--s)));justify-content:start;gap:28px 24px;padding-top:14px;padding-bottom:20px;justify-items:start}
+@media(max-width:899px){.board{grid-template-columns:repeat(2,calc(390px*var(--s)))}}
+@media(max-width:599px){.board{grid-template-columns:calc(390px*var(--s))}}
+.cell{width:calc(390px*var(--s))}
+.fw{width:calc(390px*var(--s));height:calc(844px*var(--s))}
+.fw .frame{transform:scale(var(--s));transform-origin:0 0}
+.desc{font-size:13px}
+/* A figure is a panel with the same box model whether or not it is chosen, so rows stay aligned.
+   The negative margin cancels the padding and border, so the frame grid is unchanged. */
+.cell{position:relative;box-sizing:content-box;padding:12px;border:2px solid transparent;border-radius:12px;margin:-14px}
+.board{padding-top:20px}
+.cell.chosen{background:rgba(212,237,188,.55);border-color:#13734b}
+/* a board with a chosen figure reserves room for the chip (12px + 16px + 8px) above every label in it */
+.board.has-chosen .cell{padding-top:36px}
+/* plain text, not a pill: #13734b on the panel fill is 4.8:1 */
+.chip{position:absolute;top:12px;left:12px;display:inline-flex;align-items:center;gap:7px;height:16px;line-height:16px;color:#13734b;font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.top .crumb{margin:0 0 14px}
+/* page switcher */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 4px}
+.tab{height:40px;padding:0 22px;border:0;border-radius:999px;background:#D9D4CC;color:var(--ink);font:600 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.tab:hover{background:#CBC5BB}
+.tab[aria-selected="true"],.tab[aria-selected="true"]:hover{background:var(--ink);color:#fff}
+.tab:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.ptitle{display:none}
+[hidden]{display:none!important}

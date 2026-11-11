@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>My Events</title>
+<link rel="icon" href="data:,">
+<script>/* before first paint: inside the case page's phone frame the banner is hidden and takes no space */
+if (window.self !== window.top) document.documentElement.classList.add('in-frame');</script>
+<link rel="preload" href="fonts/Inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Inter-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Inter-latin-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+  /* Inter (OFL, see fonts/OFL.txt): self-hosted latin subset, the weights the UI uses */
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/Inter-latin-400.woff2) format('woff2');
+    unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/Inter-latin-500.woff2) format('woff2');
+    unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/Inter-latin-600.woff2) format('woff2');
+    unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  :root{
+    --ink:#121212; --soft:#5C5C5C; --faint:#707070;
+    --line:#E8E6E3; --line2:#F2F0ED; --paper:#fff; --wash:#F7F6F4;
+    --have:#4A6B52; --haveBg:#EDF2EE; --sheetH:620px;
+    --banner-h:30px; --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    --serif:'Instrument Serif',Georgia,serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  html.in-frame{--banner-h:0px}
+  /* the banner sits above .app in a column, so every screen, sheet and nav inside .app lays out against .app, not the window */
+  body{display:flex;flex-direction:column;margin:0;font-family:var(--sans);color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+  button,input{font:inherit;color:inherit}
+  [hidden]{display:none !important}
+  :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  button{border:none;background:none;cursor:pointer;text-align:left}
+  /* clip, not hidden: a hidden box can still be scrolled sideways by focus or scrollIntoView, which would leave a screen off-centre */
+  .app{position:relative;flex:1;min-height:0;overflow:hidden;overflow:clip}
+  .banner{position:sticky;top:0;z-index:70;flex:none;height:var(--banner-h);box-sizing:border-box;padding:0 8px;text-align:center;
+    background:#EAF1F8;border-bottom:1px solid #D3E0EE;color:#3F5368;font-size:min(11.5px,3vw);line-height:calc(var(--banner-h) - 1px);white-space:nowrap;overflow:hidden}
+  .banner .nm{font-weight:600}
+  .in-frame .banner{display:none}
+
+  /* Only the front screen is rendered. The slide between screens is a view transition, so the real layout is final
+     the moment a screen opens (nothing measures or focuses a box that is still moving). */
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--paper);visibility:hidden}
+  .screen[data-s="on"]{visibility:visible}
+  ::view-transition-old(root),::view-transition-new(root){animation-duration:.3s;animation-timing-function:cubic-bezier(.4,0,.2,1);mix-blend-mode:normal}
+  html[data-nav="forward"]::view-transition-new(root){animation-name:navFromRight}
+  html[data-nav="forward"]::view-transition-old(root){animation-name:navToBehind}
+  html[data-nav="back"]::view-transition-old(root){animation-name:navToRight;z-index:2}
+  html[data-nav="back"]::view-transition-new(root){animation-name:navFromBehind}
+  @keyframes navFromRight{from{transform:translateX(100%)}}
+  @keyframes navToBehind{to{transform:translateX(-20%)}}
+  @keyframes navToRight{to{transform:translateX(100%)}}
+  @keyframes navFromBehind{from{transform:translateX(-20%)}}
+  .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:96px}
+
+  /* top bar — uppercase, letterspaced, matches their chrome */
+  .bar{display:flex;align-items:center;gap:14px;padding:calc(31px + env(safe-area-inset-top,0px)) 18px 13px;
+    border-bottom:1px solid var(--line);background:rgba(255,255,255,.86);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);position:sticky;top:0;z-index:4}
+  .bar .t{font-size:13px;font-weight:500;letter-spacing:.18em;text-transform:uppercase}
+  .bar .t small{display:block;font-size:12px;letter-spacing:.04em;text-transform:none;color:var(--faint);font-weight:400;margin-top:3px}
+  .back{width:44px;height:44px;margin:-8px 0 -8px -12px;display:grid;place-items:center;border-radius:50%;flex-shrink:0}
+  .back:active{background:var(--wash)}
+
+  /* my events: avatar + tracked title, black pill above the nav (their "Your Lists" language) */
+  .hd{display:flex;align-items:center;gap:14px;padding:calc(46px + env(safe-area-inset-top,0px)) 18px 20px}
+  .avatar{width:40px;height:40px;border-radius:50%;background:#F2F2F2;display:grid;place-items:center;flex-shrink:0;
+    font-family:var(--serif);font-size:18px;line-height:1;color:var(--soft)}
+  .hd h1{font-size:15px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;line-height:1.2;margin:0}
+
+  /* hero for the soonest event, then the rest in rows under year headings (design R7-A) */
+  #evlist{padding:0 18px}
+  .evBtn{display:block;width:100%;min-width:0;padding:0}
+  .evBtn>span{display:flex}
+  .evBtn:focus-visible{outline-offset:3px}
+  .nextUp{height:128px;align-items:stretch;gap:18px;background:#FAFAFA;border-radius:2px;overflow:hidden}
+  .dateBox{display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+  .dateBox b{font-weight:500;letter-spacing:.16em;padding-left:.16em;text-transform:uppercase;color:var(--faint)}
+  .dateBox span{font-family:var(--serif);line-height:1}
+  .nextUp .dateBox{width:88px;gap:4px;background:#E9E6E2}
+  .nextUp .dateBox b{font-size:11px}
+  .nextUp .dateBox span{font-size:52px}
+  .nextUp .txt{display:flex;flex:1;min-width:0;flex-direction:column;align-self:center;padding-right:4px}
+  .evName{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:uppercase}
+  .nextUp .evName{font-size:13px;font-weight:600;letter-spacing:.12em;line-height:1.3;margin-bottom:8px}
+  .countdown{display:block;font-size:20px;font-weight:500;letter-spacing:.06em;line-height:1.15;color:var(--have);text-transform:uppercase}
+  .nextUp .place{display:block;font-size:13px;color:var(--faint);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .yh{margin:36px 0 0;font-size:14.5px;font-weight:500;letter-spacing:.18em;line-height:1.2;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .evRow{align-items:center;gap:14px;padding:7px 0;border-bottom:1px solid var(--line)}
+  .evRow .dateBox{width:52px;height:56px;gap:2px;background:var(--wash);border-radius:2px}
+  .evRow .dateBox b{font-size:9px}
+  .evRow .dateBox span{font-size:26px}
+  .evRow .txt{display:flex;flex:1;min-width:0;flex-direction:column}
+  .evRow .evName{font-size:13px;font-weight:500;letter-spacing:.14em;margin-bottom:5px}
+  .evRow .sub{display:block;font-size:11.5px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .evEmpty{margin:0;font-size:13px;color:var(--soft);line-height:1.55}
+
+  .addbtn{position:absolute;left:18px;right:18px;bottom:calc(12px + 58px + 12px + env(safe-area-inset-bottom,0px));z-index:29;
+    min-height:52px;border-radius:999px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;
+    font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;text-align:center}
+  .addbtn:active{background:#2B2B2B}
+  #s-home .scroll{padding-bottom:calc(12px + 58px + 12px + 52px + 28px + env(safe-area-inset-bottom,0px))}
+
+  /* forms */
+  .step{padding:24px 18px 0}
+  .step h2{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.14;margin:0 0 6px}
+  .step .sub{font-size:12.5px;color:var(--soft);line-height:1.5;margin:0 0 20px}
+  .lab{font-size:11.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:24px 0 10px}
+  .lab:first-of-type{margin-top:0}
+  .inp{width:100%;padding:13px 0;border:none;border-bottom:1px solid var(--line);font-size:15px;background:none;border-radius:0}
+  .inp:focus{outline:none;border-bottom-color:var(--ink)}
+  .inp::placeholder{color:var(--faint)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{padding:10px 14px;border:1px solid var(--line);border-radius:2px;font-size:11.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chip:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+  .subev{border-top:1px solid var(--line);padding:15px 0}
+  .subev .nm{font-family:var(--serif);font-weight:400;font-size:20px;margin-bottom:11px}
+  .subev .chips .chip{font-size:11.5px;padding:8px 11px}
+  .mini{font-size:11.5px;color:var(--faint);margin:14px 0 8px}
+  .fixedKind{font-size:15px;padding:13px 0;border-bottom:1px solid var(--line)}
+  .hint{font-size:11.5px;color:var(--faint);margin-top:9px;line-height:1.5}
+
+  /* add flow: inline pill that scrolls with the step content */
+  #addScroll{padding-bottom:0}
+  .nextRow{display:flex;justify-content:flex-end;padding:28px 18px calc(40px + env(safe-area-inset-bottom,0px))}
+  .nextBtn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:0 28px;border-radius:999px;
+    background:#EAE7E3;border:0;color:var(--ink);font-size:12.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;text-align:center}
+  .nextBtn svg{flex-shrink:0}
+  .nextBtn:active{background:#DEDAD5}
+  .nextBtn:disabled{opacity:.4;cursor:not-allowed}
+  .nextBtn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+  /* date + location */
+  .dateRow{position:relative;min-height:48px;border-bottom:1px solid var(--line)}
+  .dateRow:focus-within{border-bottom-color:var(--ink)}
+  .dateRow .inp{position:absolute;inset:0;height:100%;border-bottom:none;color:transparent;cursor:pointer}
+  .dateRow .inp:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  /* Native segments stay in the DOM for iOS/a11y but are hidden; .dateShow renders the long-form date or prompt. */
+  .dateRow .inp::-webkit-datetime-edit{opacity:0}
+  .dateRow .inp::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+  .dateShow{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;font-size:15px;pointer-events:none}
+  .dateShow.isEmpty .dtxt{color:var(--faint)}
+  .dateShow svg{opacity:.55;flex-shrink:0}
+  .locWrap{position:relative}
+  .sugg{position:absolute;left:0;right:0;top:100%;z-index:9;background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    border:1px solid var(--line);border-radius:2px;margin-top:5px;overflow:hidden;
+    box-shadow:0 8px 24px rgba(0,0,0,.09)}
+  .sugg[hidden]{display:none}
+  .sugg button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 13px;font-size:13.5px;border-bottom:1px solid var(--line2)}
+  .sugg button:active,.sugg button.hl{background:var(--wash)}
+  .suggEmpty{padding:13px;font-size:13.5px;color:var(--soft)}
+  .sugg .pin{opacity:.35;flex-shrink:0}
+  .sugg .sub2{display:block;font-size:12px;color:var(--faint);margin-top:1px}
+  .attrib{font-size:12px;color:var(--faint);padding:8px 13px;background:var(--wash)}
+
+  .addons{margin-top:4px}
+  .fixedRow{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line2)}
+  .fixedRow .nm2{font-size:14px}
+  .fixedRow .tagx{font-size:12px;color:var(--faint)}
+  .tog{display:flex;align-items:center;gap:12px;width:100%;padding:13px 0;border-bottom:1px solid var(--line2)}
+  .tog .sw{width:40px;height:24px;border-radius:999px;background:var(--line);flex-shrink:0;position:relative;transition:background .18s}
+  .tog .sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .18s}
+  .tog[aria-pressed="true"] .sw{background:var(--ink)}
+  .tog[aria-pressed="true"] .sw::after{transform:translateX(16px)}
+  .tog .tn{flex:1;font-size:14px}
+
+  /* event detail */
+  .cover{padding:22px 18px 22px;border-bottom:1px solid var(--line)}
+  /* event header block, shared by the sectioned screen and the single-sub-event feed: title and subtitle under the top bar, at the page gutter */
+  .cover .shopTitle{font-size:20px;font-weight:600;letter-spacing:.1em;line-height:1.3;margin:0 0 10px}
+  .cover .shopSub{font-size:11.5px;font-weight:500;letter-spacing:.14em;line-height:1.3;text-transform:uppercase;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .fbtn{position:relative;display:inline-flex;align-items:center;gap:7px;height:34px;margin-top:16px;padding:0 13px;border-radius:999px;
+    background:var(--line2);font-size:12.5px;color:var(--soft);text-align:center}
+  .fbtn::after{content:"";position:absolute;inset:-5px -4px}  /* 44px touch target around a 34px pill */
+  .fbtn:active{background:var(--line)}
+  .fcount{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ink);color:#fff;font-size:11px;font-weight:500;line-height:18px;text-align:center}
+  /* shopping screen */
+  .shopSec{border-bottom:1px solid var(--line);padding:30px 0 34px}
+  .secHd{display:flex;align-items:flex-start;gap:12px;padding:0 18px}
+  .secT{flex:1;min-width:0}
+  .secT h2{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.1;margin:0}
+  .secT .fm{font-size:12.5px;color:var(--soft);margin-top:5px}
+  .arrowBtn{width:44px;height:44px;margin:-4px -4px 0 0;border-radius:50%;background:var(--line2);display:grid;place-items:center;flex-shrink:0}
+  .arrowBtn:active{background:var(--line)}
+  /* one row of cards in a sideways scroller, scroll-snapped to the gutter */
+  .rail{overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:18px;scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .rail:focus-visible{outline-offset:-2px}
+  .railRow{display:flex;align-items:flex-start;gap:10px;width:max-content;padding:14px 18px 4px}
+  .shopSec .card{flex-basis:152px}
+  .pencil{width:44px;height:44px;margin:-8px -12px -8px auto;display:grid;place-items:center;border-radius:50%;flex-shrink:0;
+    transition:opacity .2s,transform .2s,visibility 0s}
+  .pencil:active{background:var(--wash)}
+  .pencil.gone{opacity:0;transform:translateY(-6px);visibility:hidden;transition:opacity .2s,transform .2s,visibility 0s .2s}
+  @media (prefers-reduced-motion:reduce){.pencil,.pencil.gone{transition:none}}
+
+  /* sub-event feed */
+  /* One markup, two headers, in reading order. Single sub-event: event title, subtitle, weather, filter pill, hairline, formality.
+     Opened from a section arrow: the top bar is back only and the serif sub-event name replaces the event title. Cards are flush to the screen. */
+  .cover .gapTitle{font-family:var(--serif);font-weight:400;font-size:31px;line-height:1.14;margin:0 0 10px}
+  .wxl{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--faint);margin-top:9px;white-space:nowrap;overflow:hidden}
+  .wxl svg{flex:none}
+  .wxl span{overflow:hidden;text-overflow:ellipsis}
+  .gSub{padding:16px 18px 0}
+  .gSub .dc{font-size:15.5px;font-weight:500;color:var(--ink);line-height:1.3}
+  .feed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 8px;padding:16px 0 0}
+  .feed .card{min-width:0}
+  .fgHead{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;min-width:0;margin:0 18px;white-space:nowrap}
+  .fgHead:not(:first-child){border-top:1px solid var(--line);padding-top:18px;margin-top:6px}
+  .fgT{font-size:13px;font-weight:500;flex-shrink:0}
+  .fgN{font-size:12px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .feedEnd{grid-column:1/-1;margin:14px 18px 4px;text-align:center;font-size:12.5px;color:var(--faint)}
+  .feed .none,.feed .empty{grid-column:1/-1;margin:6px 18px 0}
+
+  /* product card: light-gray tile, centered caption, a separate "+" under the tile. The "+" is a sibling of the product button, never nested in it. */
+  .card{position:relative;flex:0 0 140px;scroll-snap-align:start}
+  .cardBody{display:block;width:100%;padding:0;text-align:center}
+  .cardBody span{display:block}
+  .tile{position:relative;aspect-ratio:4/5;background:#FAFAFA;overflow:hidden}
+  .tile img{position:absolute;inset:0;margin:auto;width:100%;height:72%;object-fit:contain;mix-blend-mode:multiply}
+  /* category icon (I3 outline, T2 tone): the product's tint mixed with gray, so the colour filters still read */
+  .tile .pic{position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%);color:color-mix(in srgb,var(--t) 70%,#8A8A8A)}
+  .tile .pic svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2px;stroke-linejoin:round;stroke-linecap:round}
+  .cap{padding:42px 4px 0}  /* room for the 40px "+" under the tile */
+  .card .br{font-size:13px;font-weight:500;letter-spacing:.14em;line-height:1.3;text-transform:uppercase;color:var(--ink)}
+  .card .nm{font-size:14px;font-weight:400;line-height:1.35;color:var(--faint);margin-top:3px}
+  .card .pr{font-size:13px;color:var(--faint);margin-top:2px}
+  /* same box as the tile (aspect-ratio), so top:100% lands just under it whatever the card width */
+  .addSlot{position:absolute;left:0;right:0;top:0;aspect-ratio:4/5;pointer-events:none}
+  .cardAdd{position:absolute;left:50%;top:100%;width:40px;height:40px;margin:2px 0 0 -20px;display:grid;place-items:center;color:#ADADAD;pointer-events:auto}
+  .cardAdd:active{color:var(--soft)}
+
+  .none{margin:18px 18px 0;font-size:12.5px;color:var(--soft);line-height:1.55}
+  .none button{display:block;margin-top:10px;height:34px;padding:0 13px;border-radius:999px;background:var(--line2);font-size:12.5px;color:var(--ink);position:relative}
+  .none button::after{content:"";position:absolute;inset:-5px -4px}
+  .empty{margin:22px 18px;padding:26px 20px;background:var(--wash);border-radius:0;text-align:center}
+  .empty .ttl{font-family:var(--serif);font-size:20px;margin-bottom:6px}
+  .empty p{font-size:12.5px;color:var(--soft);margin:0;line-height:1.55}
+
+  /* filter and sort sheet */
+  /* absolute inside .app (which fills the viewport), not fixed: inside the case page's iframe a scroll-into-view can then reach it */
+  .sheetBack{position:absolute;inset:0;z-index:60;background:rgba(18,18,18,.42);opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
+  .sheetBack.open{opacity:1;visibility:visible;transition:opacity .25s}
+  .sheet{position:absolute;left:0;right:0;bottom:0;z-index:61;display:flex;flex-direction:column;background:#fff;
+    border-radius:14px 14px 0 0;height:min(var(--sheetH),calc(100dvh - var(--banner-h) - 16px));box-shadow:0 -8px 30px rgba(0,0,0,.12);
+    transform:translateY(100%);visibility:hidden;transition:transform .3s cubic-bezier(.32,.72,0,1),visibility 0s .3s}
+  .sheet.open{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.32,.72,0,1)}
+  .sheet.drag{transition:none}
+  .sheet:focus{outline:none}
+  @media (prefers-reduced-motion:reduce){.sheet,.sheet.open,.sheetBack,.sheetBack.open{transition:none}}
+  .sheetHd{touch-action:none;flex-shrink:0;padding:8px 18px 0}
+  .grab{width:36px;height:4px;border-radius:2px;background:#CFCBC6;margin:0 auto 2px}
+  .sheetTitle{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+  .sheetTitle h2{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.14;margin:0}
+  .sheetX{width:44px;height:44px;margin-right:-14px;display:grid;place-items:center;border-radius:50%}
+  .sheetX:active{background:var(--wash)}
+  .sheetBody{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 18px 6px}
+  .sheet .lab{margin:16px 0 8px}
+  .sheet .lab.first{margin-top:6px}
+  .fchip{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 13px;border:1px solid var(--line);border-radius:999px;
+    font-size:13px;color:var(--soft);text-align:center;background:#fff}
+  .sheet .chips{gap:6px}
+  .fchip[aria-pressed="true"],.fchip[aria-checked="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .fchip .dot{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18);flex-shrink:0}
+  .fchip[aria-pressed="true"] .dot{box-shadow:0 0 0 1.5px #fff}
+  .fchip[data-owned]{color:var(--faint);background:var(--wash);border-style:dashed;cursor:default}
+  .fchip .own{font-size:11px;color:var(--have)}
+  .sheetFoot{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:10px 18px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+  .fclear{min-height:44px;padding:0 4px;font-size:13px;color:var(--soft);text-decoration:underline;text-underline-offset:3px}
+  .fapply{min-height:48px;padding:0 28px;border-radius:999px;background:var(--ink);color:#fff;font-size:14px;font-weight:500;text-align:center}
+
+  /* floating nav: frosted pill (4 icons) + separate search circle */
+  .nav{position:absolute;left:14px;right:14px;bottom:calc(12px + env(safe-area-inset-bottom,0px));
+    display:flex;align-items:center;gap:10px;z-index:30}
+  .navPill{flex:1;min-width:0;height:58px;padding:0 7px;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;
+    background:rgba(246,244,242,.72);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
+    border:1px solid rgba(255,255,255,.7);border-radius:999px;box-shadow:0 2px 18px rgba(0,0,0,.08)}
+  .navBtn{height:44px;display:grid;place-items:center;border-radius:999px;color:var(--ink);opacity:.8}
+  .navBtn.on{opacity:1;background:rgba(255,255,255,.78);box-shadow:inset 0 0 0 1px rgba(0,0,0,.04),0 1px 4px rgba(0,0,0,.05)}
+  .navSearch{width:58px;height:58px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;color:var(--ink);
+    background:rgba(246,244,242,.72);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
+    border:1px solid rgba(255,255,255,.7);box-shadow:0 2px 18px rgba(0,0,0,.08)}
+
+  .toast{position:absolute;left:50%;bottom:88px;transform:translate(-50%,8px);background:var(--ink);color:#fff;
+    font-size:12.5px;padding:10px 16px;border-radius:18px;opacity:0;pointer-events:none;
+    transition:opacity .2s,transform .2s;z-index:40;max-width:calc(100% - 28px);text-align:center;line-height:1.35}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <symbol id="pi-dress" viewBox="0 0 48 48"><path d="M18 5 L21 5 L24 12 L27 5 L30 5 L28 19 L36 43 L12 43 L20 19 Z" vector-effect="non-scaling-stroke"/></symbol>
+  <symbol id="pi-shoes" viewBox="0 0 48 48"><path d="M 7.4 11 C 12 15 19 21.8 24.5 27.8 C 26.5 29.9 27.3 31.7 29.2 31.6 C 30.8 31.5 32 30.6 33.4 29.9 C 37.5 30.6 41.5 32.4 44.9 35.5 C 43.3 36.7 39.5 37.1 34 37.1 C 29 37.3 25.5 37.2 22 34.8 C 17 31.6 14 28.8 10.9 25.8 C 9.7 26.4 8.4 27.2 7.8 28.9 L 7.8 36.6 C 7.8 37.3 6 37.3 6 36.6 L 6 28 C 5.2 26 4.2 24 3.6 21.5 C 2.6 17.8 3.8 13.2 7.4 11 Z" vector-effect="non-scaling-stroke"/></symbol>
+  <symbol id="pi-bag" viewBox="0 0 48 48"><path d="M10 19 L38 19 L41 41 L7 41 Z" vector-effect="non-scaling-stroke"/><path d="M17 19 C17 7 31 7 31 19" vector-effect="non-scaling-stroke"/></symbol>
+  <symbol id="pi-accessory" viewBox="0 0 48 48"><path d="M14 20 L19 29 L14 39 L9 29 Z" vector-effect="non-scaling-stroke"/><path d="M34 20 L39 29 L34 39 L29 29 Z" vector-effect="non-scaling-stroke"/><path d="M14 9 V20" vector-effect="non-scaling-stroke"/><path d="M34 9 V20" vector-effect="non-scaling-stroke"/><circle cx="14" cy="7" r="2.2" vector-effect="non-scaling-stroke"/><circle cx="34" cy="7" r="2.2" vector-effect="non-scaling-stroke"/></symbol>
+</defs></svg>
+<div class="banner"><span class="bannerText">Portfolio concept by <span class="nm">Daniela Valades</span> · Not affiliated with ShopMy</span></div>
+<div class="app">
+
+  <!-- 1. MY EVENTS -->
+  <section class="screen" id="s-home" data-s="on">
+    <div class="scroll">
+      <div class="hd">
+        <span class="avatar" aria-hidden="true">MR</span>
+        <h1>My Events</h1>
+      </div>
+      <div id="evlist"></div>
+    </div>
+    <button class="addbtn" id="addEv"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Add an event</button>
+    <div class="nav">
+      <div class="navPill">
+        <span class="navBtn" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg></span>
+        <span class="navBtn" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-7-9.3A4.2 4.2 0 0112 7a4.2 4.2 0 017 3.7C19 15.4 12 20 12 20z"/></svg></span>
+        <span class="navBtn" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="4" rx="1"/><path d="M5 13v6.5a1 1 0 001 1h12a1 1 0 001-1V13M12 9v11.5M12 9C10 9 8 8 8 6.5S9.3 4.5 10.5 5 12 7.5 12 9zm0 0c2 0 4-1 4-2.5s-1.3-2-2.5-1.5S12 7.5 12 9z"/></svg></span>
+        <span class="navBtn on" role="img" aria-label="My Events, current page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
+      </div>
+      <span class="navSearch" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span>
+    </div>
+  </section>
+
+  <!-- 2. ADD EVENT -->
+  <section class="screen" id="s-add">
+    <div class="bar">
+      <button class="back" id="addBack" aria-label="Back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M8 1L1.5 7.5L8 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <div class="t"><span id="addTitle">Add event</span><small id="stepN">Step 1 of 2</small></div>
+    </div>
+    <div class="scroll" id="addScroll">
+
+      <div class="step" data-step="1">
+        <h2 id="s1-h">What are you going to?</h2>
+        <p class="sub">A weekend with four parties and a single ceremony are planned differently. Start with the shape of it.</p>
+        <div class="lab">Occasion</div>
+        <div class="chips" id="kind">
+          <button class="chip" aria-pressed="true">Wedding</button>
+          <button class="chip" aria-pressed="false">Engagement party</button>
+          <button class="chip" aria-pressed="false">Graduation</button>
+        </div>
+        <div class="fixedKind" id="kindFixed" hidden></div>
+        <p class="hint" id="kindNote" hidden>The occasion can't be changed once the event exists.</p>
+        <div class="lab">Whose</div>
+        <input class="inp" id="f-title" value="Hollis &amp; Ben" placeholder="Names or nickname">
+        <div class="lab" id="l-date">Date</div>
+        <div class="dateRow">
+          <input class="inp" id="f-date" type="date" value="2027-09-12" aria-labelledby="l-date">
+          <div class="dateShow" id="dateShow" aria-hidden="true">
+            <span class="dtxt" id="dateTxt"></span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="5" width="17" height="15.5" rx="1"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>
+          </div>
+        </div>
+        <div class="lab">Where</div>
+        <div class="locWrap">
+          <input class="inp" id="f-loc" placeholder="Search a city or venue" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="placeList" aria-describedby="placeHint">
+          <div class="sugg" id="sugg" hidden>
+            <div role="listbox" id="placeList" aria-label="Places"></div>
+            <div class="suggEmpty" data-testid="place-empty" hidden>No places found</div>
+            <div class="attrib">Locations via Google Places</div>
+          </div>
+        </div>
+        <p class="hint" id="placeHint" data-testid="place-hint" hidden></p>
+        <p class="hint" id="wxhint"></p>
+
+        <div id="addonBlock">
+          <div class="lab" id="addonLab"></div>
+          <div class="addons">
+            <div class="fixedRow"><span class="nm2" id="addonFixed"></span><span class="tagx">Always included</span></div>
+            <div id="addonList"></div>
+          </div>
+          <p class="hint">Sub-events and the formality for each are set on the next screen.</p>
+        </div>
+      </div>
+
+      <div class="step" data-step="2" hidden>
+        <h2>Which events, and how formal?</h2>
+        <p class="sub">Use the words on the invitation. If it just says "festive," say that — that's its own problem to solve.</p>
+        <div id="subevs"></div>
+      </div>
+
+      <div class="nextRow"><button class="nextBtn" id="next"></button></div>
+    </div>
+  </section>
+
+  <!-- 3. SHOPPING SCREEN -->
+  <section class="screen" id="s-shop" data-testid="shop-screen">
+    <div class="bar">
+      <button class="back" id="shopBack" aria-label="Back to My Events"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M8 1L1.5 7.5L8 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <button class="pencil" id="pencil" data-testid="edit-pencil" aria-label="Edit event"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 013 3L8 19l-4 1z"/><path d="M14.5 6.5l3 3"/></svg></button>
+    </div>
+    <div class="scroll" id="shopScroll">
+      <div class="cover">
+        <h1 class="evName shopTitle" data-testid="event-header-name"></h1>
+        <div class="shopSub" id="e-meta"></div>
+        <button class="fbtn" id="filterBtn" data-testid="filter-button" aria-label="Filter and sort" aria-haspopup="dialog">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4.5h7M12.5 4.5H14M2 11.5h1.5M7 11.5h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="10.8" cy="4.5" r="1.7" stroke="currentColor" stroke-width="1.4"/><circle cx="5.2" cy="11.5" r="1.7" stroke="currentColor" stroke-width="1.4"/></svg>
+          <span>Filter and sort</span><span class="fcount" hidden></span>
+        </button>
+      </div>
+      <div id="sections"></div>
+    </div>
+  </section>
+
+  <!-- 4. SUB-EVENT FEED -->
+  <section class="screen" id="s-gap" data-testid="gap-screen">
+    <div class="bar">
+      <button class="back" id="gapBack" aria-label="Back"><svg width="9" height="15" viewBox="0 0 9 15" fill="none"><path d="M8 1L1.5 7.5L8 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <button class="pencil" id="gapPencil" data-testid="edit-pencil" aria-label="Edit event"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 013 3L8 19l-4 1z"/><path d="M14.5 6.5l3 3"/></svg></button>
+    </div>
+    <div class="scroll" id="gapScroll">
+      <div class="cover">
+        <h1 class="evName shopTitle" id="g-event" data-testid="event-header-name"></h1>
+        <h1 class="gapTitle" id="g-name" data-testid="gap-title" hidden></h1>
+        <div class="shopSub" id="g-meta"></div>
+        <div class="wxl" id="g-wx" data-testid="weather-line"></div>
+        <button class="fbtn" id="gapFilterBtn" data-testid="filter-button" aria-label="Filter and sort" aria-haspopup="dialog">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4.5h7M12.5 4.5H14M2 11.5h1.5M7 11.5h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="10.8" cy="4.5" r="1.7" stroke="currentColor" stroke-width="1.4"/><circle cx="5.2" cy="11.5" r="1.7" stroke="currentColor" stroke-width="1.4"/></svg>
+          <span>Filter and sort</span><span class="fcount" hidden></span>
+        </button>
+      </div>
+      <div class="gSub"><div class="dc" id="g-dc"></div></div>
+      <div class="feed" id="g-feed" data-testid="feed"></div>
+      <div id="g-sentinel" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- 5. FILTER AND SORT SHEET (opened from the shopping screen) -->
+  <div class="sheetBack" id="fsBack"></div>
+  <div class="sheet" id="fsheet" data-testid="filter-sheet" role="dialog" aria-modal="true" aria-labelledby="fsTitle" tabindex="-1">
+    <div class="sheetHd" id="fsGrab">
+      <div class="grab" aria-hidden="true"></div>
+      <div class="sheetTitle">
+        <h2 id="fsTitle">Filter and sort</h2>
+        <button class="sheetX" id="fsClose" aria-label="Close filter and sort"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+    </div>
+    <div class="sheetBody">
+      <div class="lab first" id="fl-show">Show</div>
+      <div class="chips" role="group" aria-labelledby="fl-show" id="fg-show"></div>
+      <div class="lab" id="fl-price">Price</div>
+      <div class="chips" role="group" aria-labelledby="fl-price" id="fg-price"></div>
+      <div class="lab" id="fl-color">Color</div>
+      <div class="chips" role="group" aria-labelledby="fl-color" id="fg-color"></div>
+      <div class="lab" id="fl-sort">Sort</div>
+      <div class="chips" role="radiogroup" aria-labelledby="fl-sort" id="fg-sort"></div>
+    </div>
+    <div class="sheetFoot">
+      <button class="fclear" id="fsClear" data-testid="filter-clear">Clear all</button>
+      <button class="fapply" id="fsApply" data-testid="filter-apply">Show results</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+</div>
+
+<script>
+/* ============================================================
+   Seeded data. Swap `img` on PRODUCTS for real photography.
+   Curators marked followed:true rank first — matches the
+   "people you already follow" ordering rule.
+============================================================ */
+const CATS = [
+  {k:"dress",    n:"Dress"},
+  {k:"shoes",    n:"Shoes"},
+  {k:"bag",      n:"Bag"},
+  {k:"accessory",n:"Accessories"}
+];
+
+/* Rail split: share of a section's cards per element. Excluded elements
+   (owned, or switched off) drop out and the rest renormalise to RAIL_CARDS. */
+const RAIL_WEIGHTS = {dress:80, shoes:10, accessory:5, bag:5};
+const RAIL_CARDS = 20;
+/* The sub-event feed loads this many cards at a time, starting when the end is within FEED_PRELOAD_PX. */
+const FEED_BATCH = 20;
+const FEED_PRELOAD_PX = 600;
+const SHOW_LABELS = {dress:"Dresses", shoes:"Shoes", bag:"Bags", accessory:"Accessories"};
+/* Inclusive at both edges; none selected means no price filter. */
+const PRICE_RANGES = [
+  {k:"under-150", label:"Under $150",   min:0,   max:150},
+  {k:"150-300",   label:"$150\u2013$300", min:150, max:300},
+  {k:"300-500",   label:"$300\u2013$500", min:300, max:500},
+  {k:"500-plus",  label:"$500+",        min:500, max:Infinity}
+];
+/* One place for the sort wording, so it can be swapped for ShopMy's own. */
+const DEFAULT_SORT = "recommended";
+const SORT_OPTIONS = [
+  {k:DEFAULT_SORT, label:"Recommended"},
+  {k:"price-asc",  label:"Price: low to high"},
+  {k:"price-desc", label:"Price: high to low"}
+];
+const DISMISS_DRAG_PX = 90;
+const FOLLOWED = ["Lauren Carter", "sarahLstyled"];
+
+/* Formality ladder; products list the rungs they suit. */
+const F = {CASUAL:0, GARDEN:1, COCKTAIL:2, BTO:3, BT:4};
+const FORMALITY_RANK = {
+  "Casual":F.CASUAL, "Garden formal":F.GARDEN, "Cocktail":F.COCKTAIL,
+  "Black tie optional":F.BTO, "Black tie":F.BT, "Just says “festive”":F.COCKTAIL
+};
+
+const {CASUAL, GARDEN, COCKTAIL, BTO, BT} = F;
+/* Swatches for the colour filter. Every product carries one of these names. */
+const COLORS = [
+  {k:"black", n:"Black", hex:"#1F1F22"}, {k:"white", n:"White", hex:"#FFFFFF"},
+  {k:"cream", n:"Cream", hex:"#E8DCC0"}, {k:"tan",   n:"Tan",   hex:"#B58A62"},
+  {k:"green", n:"Green", hex:"#4F7A5A"}, {k:"red",   n:"Red",   hex:"#A23440"},
+  {k:"pink",  n:"Pink",  hex:"#D5A9A6"}, {k:"blue",  n:"Blue",  hex:"#5B78A8"}
+];
+/* priceNum is derived once from the display price; filters and sorting use it. */
+const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const item = (cat, brand, name, price, tint, color, by, fits) =>
+  ({id:slug(`${brand} ${name}`), cat, brand, name, price, priceNum:Number(price.replace(/[^0-9.]/g,"")), tint, color, by, followed:FOLLOWED.includes(by), fits});
+
+const PRODUCTS = [
+  item("dress","Reformation","Bias silk midi, juniper","$298","#7F8D6B","green","sarahLstyled",[COCKTAIL,GARDEN,BTO]),
+  item("dress","Sir.","Draped one-shoulder gown","$420","#9B2F3C","red","Lauren Carter",[BTO,BT]),
+  item("dress","Cult Gaia","Cowl-neck column, plum","$468","#6B3A52","red","Gabriela",[BTO,BT]),
+  item("dress","Staud","Satin slip, champagne","$275","#CDB99B","cream","Lauren Carter",[COCKTAIL,BTO]),
+  item("dress","Rixo","Pleated chiffon midi, sage","$330","#A5B09A","green","Mikaela",[GARDEN,COCKTAIL]),
+  item("dress","Ulla Johnson","Tiered silk maxi, dusk blue","$690","#6C7FA0","blue","sarahLstyled",[GARDEN,COCKTAIL,BTO]),
+  item("dress","Zimmermann","Linen wrap midi, sand","$450","#D6C8B0","tan","Caitlin Johnson",[CASUAL,GARDEN]),
+  item("dress","Doen","Cotton poplin sundress, sky","$248","#9DB7CC","blue","Noor Haddad",[CASUAL,GARDEN]),
+  item("dress","Hill House","Smocked day dress, rose","$190","#C99AA0","pink","Lauren Carter",[CASUAL,GARDEN]),
+  item("dress","LoveShackFancy","Floral tea dress, blue","$395","#8FA6BE","blue","Tessa Brandt",[GARDEN,CASUAL]),
+  item("dress","Amsale","Crepe halter gown, graphite","$520","#44474D","black","Ava shook",[BT,BTO]),
+  item("dress","Monique Lhuillier","Sequin column, deep green","$780","#2F4A3C","green","Imogen Park",[BT,BTO]),
+  item("dress","Aje","Satin bow-back midi, wine","$360","#6E2438","red","sarahLstyled",[COCKTAIL,BTO]),
+  item("dress","Ganni","Ruched jersey midi, olive","$285","#77795A","green","Rafaela Ortiz",[COCKTAIL,CASUAL]),
+  item("dress","Nanushka","Satin slip, black","$395","#1F1F22","black","Gabriela",[COCKTAIL]),
+  item("dress","Jenny Yoo","Chiffon maxi, dusty rose","$260","#D5A9A6","pink","Mikaela",[GARDEN,COCKTAIL,BTO]),
+  item("dress","Marchesa Notte","Tulle ball gown, ink","$890","#232B45","blue","Imogen Park",[BT]),
+  item("dress","Alex Perry","Cutout crepe gown, cobalt","$640","#2F4C8F","blue","Noor Haddad",[BTO,BT]),
+  item("dress","Christy Dawn","Eyelet midi, butter","$228","#E2D49A","cream","Tessa Brandt",[CASUAL,GARDEN]),
+  item("dress","A.L.C.","Satin wrap dress, coral","$425","#D98068","red","Caitlin Johnson",[COCKTAIL,GARDEN]),
+  item("dress","Sandro","Lace mini, black","$350","#26262A","black","Ava shook",[COCKTAIL]),
+  item("dress","Reformation","Silk bias maxi, mulberry","$348","#7A3F5B","red","Lauren Carter",[BTO,COCKTAIL]),
+  item("dress","Rat & Boa","Sequin midi, bronze","$320","#9A7A52","tan","Rafaela Ortiz",[COCKTAIL,BTO]),
+  item("dress","Staud","Taffeta off-shoulder gown, emerald","$395","#2E6B4F","green","Gabriela",[BTO,BT]),
+  item("dress","Zimmermann","Floral silk maxi, poppy","$850","#B24A3A","red","sarahLstyled",[GARDEN,BTO]),
+  item("dress","Cult Gaia","Raffia-trim mini, tangerine","$298","#D99A5B","tan","Mikaela",[CASUAL,COCKTAIL]),
+  item("dress","Rixo","Velvet wrap midi, burgundy","$410","#5B2230","red","Lauren Carter",[COCKTAIL,BTO]),
+  item("dress","Mac Duggal","Beaded gown, slate","$498","#5E6B78","blue","Imogen Park",[BT,BTO]),
+
+  item("shoes","Dear Frances","Suede slingback, oxblood","$395","#6E2E2E","red","Lauren Carter",[COCKTAIL,BTO]),
+  item("shoes","Ancient Greek","Leather flat sandal","$185","#C9B49A","tan","sarahLstyled",[CASUAL,GARDEN,COCKTAIL]),
+  item("shoes","Sarah Flint","Block heel, 60mm","$425","#D7CFC4","white","Mikaela",[COCKTAIL,BTO]),
+  item("shoes","Loeffler Randall","Satin knot heel","$350","#B9A6AE","pink","Ava shook",[COCKTAIL,BTO,BT]),
+  item("shoes","Jimmy Choo","Crystal-strap sandal","$795","#D9D2CC","white","Imogen Park",[BT,BTO]),
+  item("shoes","Aquazzura","Ankle-wrap heel, blush","$650","#D8BFAE","pink","Lauren Carter",[BTO,BT,COCKTAIL]),
+  item("shoes","Mansur Gavriel","Leather mule, tan","$425","#B58A62","tan","sarahLstyled",[CASUAL,GARDEN]),
+  item("shoes","Stuart Weitzman","Block-heel sandal, gold","$425","#C6A55C","tan","Gabriela",[COCKTAIL,GARDEN,BTO]),
+  item("shoes","Margaux","The Pointe flat, black","$285","#1F1F22","black","Caitlin Johnson",[COCKTAIL,GARDEN,CASUAL]),
+  item("shoes","Larroudé","Strappy kitten heel, champagne","$340","#CDB99B","cream","sarahLstyled",[COCKTAIL,GARDEN,BTO]),
+  item("shoes","Sam Edelman","Espadrille wedge, natural","$140","#D8C6A3","cream","Tessa Brandt",[CASUAL,GARDEN]),
+  item("shoes","Manolo Blahnik","Satin pump, navy","$745","#25335A","blue","Rafaela Ortiz",[BTO,BT]),
+  item("shoes","Gianvito Rossi","Satin pump, graphite","$795","#50545B","black","Noor Haddad",[BT,BTO]),
+  item("shoes","Souliers Martinez","Raffia slide, ecru","$215","#D9CCAF","cream","Lauren Carter",[CASUAL,GARDEN,COCKTAIL]),
+
+  item("bag","Hereu","Raffia top-handle","$295","#CFBB95","tan","sarahLstyled",[CASUAL,GARDEN,COCKTAIL]),
+  item("bag","Staud","Shell clutch, gold","$225","#C8A96A","tan","Gabriela",[COCKTAIL,BTO]),
+  item("bag","Cesta","Beaded mini pouch","$168","#A9B3BE","blue","Caitlin Johnson",[COCKTAIL,GARDEN]),
+  item("bag","Mansur Gavriel","Mini bucket, oxblood","$395","#6E2E2E","red","Lauren Carter",[COCKTAIL,BTO]),
+  item("bag","Cult Gaia","Acrylic arc clutch, amber","$328","#C98A3E","tan","Mikaela",[COCKTAIL,BTO,BT]),
+  item("bag","Loewe","Straw basket tote","$390","#CDB784","tan","Tessa Brandt",[CASUAL,GARDEN]),
+  item("bag","Jimmy Choo","Crystal clutch","$995","#D9D2CC","white","Imogen Park",[BT,BTO]),
+  item("bag","Khaite","Satin envelope clutch, black","$780","#1F1F22","black","Lauren Carter",[BTO,BT,COCKTAIL]),
+  item("bag","Bembien","Leather mini shoulder, tan","$260","#A57B55","tan","sarahLstyled",[CASUAL,GARDEN,COCKTAIL]),
+  item("bag","Naghedi","Woven pouch, sage","$185","#A5B09A","green","Noor Haddad",[GARDEN,CASUAL]),
+  item("bag","Clare V.","Petit Moyen, red","$215","#B24A3A","red","Rafaela Ortiz",[COCKTAIL,GARDEN]),
+  item("bag","Edie Parker","Beaded box clutch, navy","$590","#25335A","blue","Ava shook",[BTO,BT]),
+
+  item("accessory","Mejuri","Pearl drop earrings","$148","#E7E1D6","white","Lauren Carter",[COCKTAIL,BTO,BT,GARDEN]),
+  item("accessory","Jennifer Behr","Satin bow barrette","$128","#232B45","blue","sarahLstyled",[COCKTAIL,GARDEN,BTO]),
+  item("accessory","Lele Sadoughi","Crystal headband, champagne","$195","#D8C9A9","cream","Tessa Brandt",[BTO,BT,COCKTAIL]),
+  item("accessory","Toteme","Printed silk scarf","$290","#9AA3A8","blue","Lauren Carter",[COCKTAIL,GARDEN,BTO]),
+  item("accessory","Sophie Buhai","Gold hoop earrings","$275","#C8A96A","tan","Gabriela",[COCKTAIL,CASUAL,GARDEN]),
+  item("accessory","Missoma","Layered chain necklace","$165","#C9B38A","tan","Caitlin Johnson",[CASUAL,GARDEN,COCKTAIL]),
+  item("accessory","Janessa Leone","Wide-brim straw hat","$228","#D6C4A0","tan","Noor Haddad",[CASUAL,GARDEN]),
+  item("accessory","Le Specs","Oval sunglasses, tortoise","$89","#6B4A33","tan","sarahLstyled",[CASUAL,GARDEN]),
+  item("accessory","Alighieri","Gold statement cuff","$320","#C6A55C","tan","Rafaela Ortiz",[BTO,BT]),
+  item("accessory","Oscar de la Renta","Crystal drop earrings","$395","#D9D2CC","white","Imogen Park",[BT,BTO])
+];
+
+/* Typical weather is structured data: {day, eve} in degrees F, or {indoor:true}. A place outside PLACES has no forecast yet.
+   The weather is derived from the event's place, never stored on the event. */
+const INDOOR = {indoor:true};
+const WEATHER_INDOOR_TEXT = "Climate controlled";
+const WEATHER_MISSING_TEXT = "Typical weather not available yet";
+const weatherText = wx => !wx ? WEATHER_MISSING_TEXT
+  : wx.indoor ? WEATHER_INDOOR_TEXT
+  : `Typically ${wx.day}\u00B0 by day and ${wx.eve}\u00B0 by evening`;
+const SUN_CLOUD_ICON = '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="2.4" stroke="currentColor" stroke-width="1.3"/><path d="M6 1v1M1 6h1M2.5 2.5l.7.7M9.5 2.5l-.7.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5.5 14h7a2.2 2.2 0 000-4.4 3 3 0 00-5.7.6A2.1 2.1 0 005.5 14z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="#fff"/></svg>';
+const weatherHTML = wx => `${wx && wx.indoor ? "" : SUN_CLOUD_ICON}<span>${weatherText(wx)}</span>`;
+
+/* Stands in for Google Places: the only places an event can have. Real build: Places Autocomplete for the
+   place, then a forecast API keyed off its lat/lng and the event date. */
+const PLACES = [
+  {name:"Savannah, GA", region:"Georgia", wx:{day:76, eve:58}},
+  {name:"Charleston, SC", region:"South Carolina", wx:{day:59, eve:42}},
+  {name:"Napa, CA", region:"California", wx:{day:84, eve:58}},
+  {name:"Ann Arbor, MI", region:"Michigan", wx:{day:70, eve:52}},
+  {name:"Hudson Valley, NY", region:"New York", wx:{day:58, eve:41}},
+  {name:"The Plaza, New York", region:"Midtown, New York", wx:INDOOR},
+  {name:"Garrison, NY", region:"Hudson Valley, New York", wx:{day:70, eve:54}},
+  {name:"Rhinebeck, NY", region:"Dutchess County, New York", wx:{day:70, eve:61}},
+  {name:"Montauk, NY", region:"Long Island, New York", wx:{day:68, eve:60}},
+  {name:"Brooklyn, NY", region:"New York City", wx:{day:72, eve:60}},
+  {name:"San Miguel de Allende", region:"Guanajuato, Mexico", wx:{day:72, eve:52}},
+  {name:"Boston, MA", region:"Massachusetts", wx:{day:66, eve:50}},
+  {name:"Newport, RI", region:"Rhode Island", wx:{day:68, eve:56}},
+  {name:"Cape May, NJ", region:"New Jersey", wx:{day:74, eve:62}},
+  {name:"Philadelphia, PA", region:"Pennsylvania", wx:{day:72, eve:55}},
+  {name:"Washington, DC", region:"District of Columbia", wx:{day:74, eve:58}},
+  {name:"Richmond, VA", region:"Virginia", wx:{day:73, eve:55}},
+  {name:"Asheville, NC", region:"North Carolina", wx:{day:69, eve:48}},
+  {name:"Charlotte, NC", region:"North Carolina", wx:{day:76, eve:57}},
+  {name:"Atlanta, GA", region:"Georgia", wx:{day:78, eve:60}},
+  {name:"Nashville, TN", region:"Tennessee", wx:{day:77, eve:57}},
+  {name:"New Orleans, LA", region:"Louisiana", wx:{day:82, eve:68}},
+  {name:"Miami, FL", region:"Florida", wx:{day:85, eve:73}},
+  {name:"Palm Beach, FL", region:"Florida", wx:{day:84, eve:72}},
+  {name:"Austin, TX", region:"Texas", wx:{day:83, eve:63}},
+  {name:"Houston, TX", region:"Texas", wx:{day:84, eve:67}},
+  {name:"Marfa, TX", region:"Texas", wx:{day:79, eve:50}},
+  {name:"Santa Fe, NM", region:"New Mexico", wx:{day:72, eve:45}},
+  {name:"Scottsdale, AZ", region:"Arizona", wx:{day:90, eve:65}},
+  {name:"Sedona, AZ", region:"Arizona", wx:{day:82, eve:56}},
+  {name:"Aspen, CO", region:"Colorado", wx:{day:68, eve:38}},
+  {name:"Denver, CO", region:"Colorado", wx:{day:72, eve:44}},
+  {name:"Park City, UT", region:"Utah", wx:{day:70, eve:43}},
+  {name:"Jackson, WY", region:"Wyoming", wx:{day:66, eve:36}},
+  {name:"Seattle, WA", region:"Washington", wx:{day:67, eve:52}},
+  {name:"Portland, OR", region:"Oregon", wx:{day:70, eve:52}},
+  {name:"Healdsburg, CA", region:"California", wx:{day:85, eve:52}},
+  {name:"Santa Barbara, CA", region:"California", wx:{day:74, eve:56}},
+  {name:"Los Angeles, CA", region:"California", wx:{day:80, eve:62}},
+  {name:"San Francisco, CA", region:"California", wx:{day:68, eve:54}},
+  {name:"Lake Tahoe, CA", region:"California", wx:{day:70, eve:40}},
+  {name:"Maui, HI", region:"Hawaii", wx:{day:84, eve:70}},
+  {name:"Chicago, IL", region:"Illinois", wx:{day:72, eve:56}},
+  {name:"Minneapolis, MN", region:"Minnesota", wx:{day:70, eve:52}},
+  {name:"Traverse City, MI", region:"Michigan", wx:{day:68, eve:50}},
+  {name:"Door County, WI", region:"Wisconsin", wx:{day:67, eve:50}},
+  {name:"Lake Como, Italy", region:"Lombardy, Italy", wx:{day:80, eve:64}},
+  {name:"Tuscany, Italy", region:"Italy", wx:{day:81, eve:60}},
+  {name:"Amalfi Coast, Italy", region:"Campania, Italy", wx:{day:82, eve:68}},
+  {name:"Provence, France", region:"France", wx:{day:80, eve:58}},
+  {name:"Paris, France", region:"Île-de-France, France", wx:{day:72, eve:57}},
+  {name:"London, UK", region:"England", wx:{day:68, eve:54}},
+  {name:"Mexico City, Mexico", region:"Mexico", wx:{day:75, eve:54}},
+  {name:"Tulum, Mexico", region:"Quintana Roo, Mexico", wx:{day:88, eve:76}}
+];
+const placeWx = name => (PLACES.find(p=>p.name===name) || {}).wx || null;
+const PLACE_MAX_OPTIONS = 6;
+const PLACE_HINT_TEXT = "Choose a place from the list.";
+
+/* Occasions with an events block on step 1: the pinned central event, plus switches for the rest.
+   `order` is the order the sub-events are saved in. */
+const EVENT_PLANS = {
+  "Wedding":    {label:"Events that weekend", central:"Ceremony & reception",
+                 order:["Welcome party","Rehearsal dinner","Ceremony & reception","Farewell brunch"]},
+  "Graduation": {label:"Events that day", central:"Graduation day",
+                 order:["Graduation day","Dinner","Party"]}
+};
+const DEFAULT_ADDONS = ["Welcome party","Farewell brunch"];
+const DEFAULT_FORMALITY = "Cocktail";
+const DEFAULT_BY_NAME = {
+  "Ceremony & reception":"Black tie optional",
+  "Farewell brunch":"Casual",
+  "Graduation day":"Garden formal",
+  "Dinner":"Cocktail",
+  "Party":"Casual"
+};
+const CENTRAL_NAMES = Object.values(EVENT_PLANS).map(p=>p.central);
+const CODES = ["Black tie","Black tie optional","Cocktail","Garden formal","Casual","Just says “festive”"];
+const MONTH_NAMES = ["January","February","March","April","May","June","July",
+                     "August","September","October","November","December"];
+const DAY_MS = 86400000, DAYS_PER_WEEK = 7, DAYS_PER_MONTH = 30.44;
+/* Countdown wording by whole days to go: days from 2, weeks from 14, months from 63. */
+const WEEKS_FROM_DAYS = 14, MONTHS_FROM_DAYS = 63, TOMORROW_DAYS = 1;
+const MONTH_ABBR_LEN = 3, UNDATED_LAST = "9999-12-31";
+const NO_DATE = {year:"TBD", month:"TBD", day:"\u2013", countdown:"Date TBD"};
+const SCROLL_HIDE_AFTER = 24, SCROLL_NOISE = 4;
+const RETAILER_TOAST = "Opens on the retailer’s site in the real product.";
+const ADD_TO_LIST_TOAST = "Prompted to ‘Add to a list’";
+
+const pad2 = n => String(n).padStart(2, "0");
+const emptyHave = () => ({dress:false, shoes:false, bag:false, accessory:false});
+
+/* Seed dates are offsets from today, so the demo never goes stale. */
+const seedSub = (nm, owned = {}, note = "") =>
+  ({nm, dc: DEFAULT_BY_NAME[nm] || DEFAULT_FORMALITY, have:{...emptyHave(), ...owned}, note});
+const SEED_EVENTS = [
+  {title:"Priya & Dom", kind:"Wedding", loc:"Hudson Valley, NY", inDays:22,
+    subs:[
+      seedSub("Welcome party", {dress:true}, "The green silk from Ana's wedding — already worn it once in this group, but not to these people."),
+      seedSub("Ceremony & reception"),
+      seedSub("Farewell brunch")
+    ]},
+  {title:"Imani", kind:"Graduation", loc:"Ann Arbor, MI", inDays:204,
+    subs:[seedSub("Graduation day")]},
+  {title:"Alex", kind:"Engagement party", loc:"Napa, CA", inDays:227,
+    subs:[seedSub("Engagement party")]},
+  {title:"Tess & Jon", kind:"Wedding", loc:"Charleston, SC", inDays:442,
+    subs:[seedSub("Welcome party"), seedSub("Ceremony & reception"), seedSub("Farewell brunch")]}
+];
+/* Local date components, never toISOString, so a late-evening clock cannot land on the wrong day. */
+const isoFromDate = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+function isoInDays(n){
+  const t = new Date();
+  return isoFromDate(new Date(t.getFullYear(), t.getMonth(), t.getDate() + n));
+}
+let events = SEED_EVENTS.map(({inDays, ...ev}, i) => ({id:i+1, ...ev, date:isoInDays(inDays)}));
+
+const LAST_STEP = 2;
+let draft = null, step = 1, curEv = null, curSub = null;
+const $ = s => document.querySelector(s);
+const stack = ["s-home"];
+const SCR = ["s-home","s-add","s-shop","s-gap"];
+const esc = t => String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function paint(){
+  const top = stack[stack.length-1];
+  SCR.forEach(id=>{
+    const el = document.getElementById(id), i = stack.indexOf(id);
+    el.dataset.s = id===top ? "on" : (i>-1 ? "back" : "");
+    el.style.zIndex = i;  /* later in the stack paints on top, whatever the DOM order */
+  });
+}
+/* Runs a screen change inside a view transition (slide), or straight away where that is unsupported or motion is reduced. */
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+function navigate(update, direction){
+  if(!document.startViewTransition || reducedMotion.matches){ update(); return; }
+  document.documentElement.dataset.nav = direction;
+  document.startViewTransition(update);
+}
+function push(id){ navigate(()=>{ stack.push(id); paint(); }, "forward"); }
+function pop(){ if(stack.length>1) navigate(()=>{ stack.pop(); paint(); }, "back"); }
+
+function needed(sub){ return CATS.filter(c=>!sub.have[c.k]); }
+
+function prettyDate(v){
+  if(!v) return "Date TBD";
+  const [y,m,d] = v.split("-").map(Number);
+  return `${MONTH_NAMES[m-1]} ${d}, ${y}`;
+}
+/* Whole local calendar days from today to the event date. */
+function daysUntil(iso){
+  const [y,m,d] = iso.split("-").map(Number);
+  const t = new Date(); t.setHours(0,0,0,0);
+  return Math.round((new Date(y,m-1,d) - t) / DAY_MS);
+}
+function countdownLabel(iso){
+  if(!iso) return NO_DATE.countdown;
+  const days = daysUntil(iso);
+  const inN = (n, unit) => `In ${n} ${unit}`;
+  if(days<=0) return "Today";
+  if(days===TOMORROW_DAYS) return "Tomorrow";
+  if(days<WEEKS_FROM_DAYS) return inN(days, "days");
+  if(days<MONTHS_FROM_DAYS) return inN(Math.round(days/DAYS_PER_WEEK), "weeks");
+  return inN(Math.round(days/DAYS_PER_MONTH), "months");
+}
+/* "Alex" + Engagement party -> "Alex’s engagement party". The stored title stays what was typed. */
+const eventName = ev => `${ev.title}\u2019s ${ev.kind.toLowerCase()}`;
+function dateParts(iso){
+  if(!iso) return NO_DATE;
+  const [y,m,d] = iso.split("-").map(Number);
+  return {year:String(y), month:MONTH_NAMES[m-1].slice(0, MONTH_ABBR_LEN), day:String(d)};
+}
+const dateBoxHTML = (iso, testid) => {
+  const p = dateParts(iso);
+  return `<span class="dateBox" data-testid="${testid}"><b>${p.month}</b><span>${p.day}</span></span>`;
+};
+/* The place, plus " · N events" only when the event has more than one. */
+const placeLine = ev => `${ev.loc}${ev.subs.length>1 ? ` · ${ev.subs.length} events` : ""}`;
+function heroHTML(ev){
+  return `<button class="evBtn" data-testid="event-card" data-title="${esc(ev.title)}" data-ev="${ev.id}">
+    <span class="nextUp" data-testid="next-up">
+      ${dateBoxHTML(ev.date, "next-up-date")}
+      <span class="txt">
+        <span class="evName" data-testid="next-up-name">${esc(eventName(ev))}</span>
+        <span class="countdown" data-testid="next-up-countdown">${countdownLabel(ev.date)}</span>
+        <span class="place" data-testid="next-up-place">${esc(placeLine(ev))}</span>
+      </span>
+    </span>
+  </button>`;
+}
+function rowHTML(ev){
+  return `<button class="evBtn" data-testid="event-card" data-title="${esc(ev.title)}" data-ev="${ev.id}">
+    <span class="evRow" data-testid="event-row">
+      ${dateBoxHTML(ev.date, "row-date")}
+      <span class="txt">
+        <span class="evName" data-testid="row-name">${esc(eventName(ev))}</span>
+        <span class="sub" data-testid="row-sub">${esc(placeLine(ev))}</span>
+      </span>
+    </span>
+  </button>`;
+}
+/* ---------- my events ---------- */
+/* The soonest event is the hero; the rest follow by date under year headings. Undated events go last. */
+function renderHome(){
+  const list = $("#evlist");
+  if(!events.length){
+    list.innerHTML = `<p class="evEmpty">Add your first event. Tap the button below to start.</p>`;
+    return;
+  }
+  const key = ev => ev.date || UNDATED_LAST;
+  const byDate = [...events].sort((a,b)=> (key(a) > key(b)) - (key(a) < key(b)));
+  const [first, ...rest] = byDate;
+  let html = heroHTML(first), year = null;
+  rest.forEach(ev=>{
+    const y = dateParts(ev.date).year;
+    if(y !== year){ year = y; html += `<h2 class="yh" data-testid="year-heading" data-year="${y}">${y}</h2>`; }
+    html += rowHTML(ev);
+  });
+  list.innerHTML = html;
+}
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-ev]");
+  if(b) openEvent(events.find(x=>x.id === +b.dataset.ev));
+});
+
+/* ---------- add / edit flow ---------- */
+function chipGroup(el, multi){
+  el.addEventListener("click", e=>{
+    const b = e.target.closest(".chip"); if(!b) return;
+    if(multi) b.setAttribute("aria-pressed", b.getAttribute("aria-pressed")==="true"?"false":"true");
+    else { [...el.children].forEach(c=>c.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true"); }
+  });
+}
+chipGroup($("#kind"), false);
+
+/* --- occasion gates the add-on events --- */
+$("#kind").addEventListener("click", ()=>{ renderAddons(); });
+function setKind(k){ [...$("#kind").children].forEach(c=>c.setAttribute("aria-pressed", String(c.textContent.trim()===k))); }
+const currentPlan = () => EVENT_PLANS[pressed("#kind")];
+function renderAddons(){
+  const plan = currentPlan();
+  $("#addonBlock").hidden = !plan;
+  if(!plan){ $("#addonList").innerHTML = ""; return; }
+  $("#addonLab").textContent = plan.label;
+  $("#addonFixed").textContent = plan.central;
+  $("#addonList").innerHTML = plan.order.filter(a=>a!==plan.central).map(a=>`
+    <button class="tog" data-addon="${a}" aria-pressed="${draft.addons.includes(a)}">
+      <span class="tn">${a}</span><span class="sw"></span>
+    </button>`).join("");
+}
+$("#addonList").addEventListener("click", e=>{
+  const b = e.target.closest("[data-addon]"); if(!b) return;
+  const a = b.dataset.addon, i = draft.addons.indexOf(a);
+  if(i>-1) draft.addons.splice(i,1); else draft.addons.push(a);
+  renderAddons();
+});
+
+/* --- date: native picker only (no typing). The input stays type="date" so iOS uses its wheel and the value stays ISO. */
+const dateIn = $("#f-date");
+dateIn.min = isoInDays(0);
+const PICKER_KEYS = ["Enter", " "], PASSTHROUGH_KEYS = ["Tab", "Escape"];
+function openDatePicker(){
+  try { dateIn.showPicker(); } catch(e) { /* unsupported or blocked: native default behaviour */ }
+}
+function syncDate(){
+  const v = dateIn.value;
+  $("#dateTxt").textContent = v ? prettyDate(v) : "Choose a date";
+  $("#dateShow").classList.toggle("isEmpty", !v);
+}
+dateIn.addEventListener("click", openDatePicker);
+dateIn.addEventListener("keydown", e=>{
+  if(PASSTHROUGH_KEYS.includes(e.key)) return;
+  if((e.ctrlKey || e.metaKey) && !["Backspace","Delete"].includes(e.key)) return;
+  e.preventDefault();
+  if(PICKER_KEYS.includes(e.key)) openDatePicker();
+});
+dateIn.addEventListener("input", syncDate);
+dateIn.addEventListener("change", syncDate);
+syncDate();
+
+/* --- place picker (stands in for Google Places): a place only counts once it is chosen from the list --- */
+const locIn = $("#f-loc"), suggEl = $("#sugg"), listEl = $("#placeList"), emptyEl = $('[data-testid="place-empty"]');
+let shownPlaces = [], hl = -1;
+function showForecast(p){
+  $("#wxhint").innerHTML = p && placeWx(p.name) ? `<b style="color:var(--ink);font-weight:500">${weatherText(placeWx(p.name))}</b>.` : "";
+}
+/* Continue on step 1 needs a chosen place; the hint shows while typed text has not been chosen. */
+function syncPlaceState(){
+  const typed = locIn.value.trim() !== "";
+  const hint = $("#placeHint");
+  hint.hidden = !typed || !!draft.place;
+  hint.textContent = hint.hidden ? "" : PLACE_HINT_TEXT;
+  $("#next").disabled = step===1 && !draft.place;
+}
+function closeSugg(){
+  suggEl.hidden = true; listEl.innerHTML = ""; shownPlaces = []; hl = -1;
+  locIn.setAttribute("aria-expanded","false"); locIn.removeAttribute("aria-activedescendant");
+}
+function setHighlight(i){
+  hl = i;
+  listEl.querySelectorAll("[role=option]").forEach((o,k)=>{ o.classList.toggle("hl", k===i); o.setAttribute("aria-selected", String(k===i)); });
+  if(i<0) locIn.removeAttribute("aria-activedescendant");
+  else { const o = listEl.children[i]; locIn.setAttribute("aria-activedescendant", o.id); o.scrollIntoView({block:"nearest"}); }
+}
+function setPlace(p){
+  draft.place = p;
+  locIn.value = p.name;
+  closeSugg();
+  showForecast(p);
+  syncPlaceState();
+}
+function showSugg(q){
+  const needle = q.trim().toLowerCase();
+  if(!needle){ closeSugg(); return; }
+  shownPlaces = PLACES.filter(p=> `${p.name} ${p.region}`.toLowerCase().includes(needle)).slice(0, PLACE_MAX_OPTIONS);
+  hl = -1;
+  listEl.innerHTML = shownPlaces.map((p,i)=>`
+    <button role="option" id="place-opt-${i}" tabindex="-1" aria-selected="false" data-testid="place-option" data-place="${esc(p.name)}">
+      <svg class="pin" width="13" height="16" viewBox="0 0 13 16" fill="none" aria-hidden="true"><path d="M6.5 1C3.9 1 1.8 3.1 1.8 5.7c0 3.5 4.7 9 4.7 9s4.7-5.5 4.7-9C11.2 3.1 9.1 1 6.5 1z" stroke="currentColor" stroke-width="1.3"/><circle cx="6.5" cy="5.7" r="1.7" fill="currentColor"/></svg>
+      <span>${esc(p.name)}<span class="sub2">${esc(p.region)}</span></span>
+    </button>`).join("");
+  listEl.hidden = !shownPlaces.length;
+  emptyEl.hidden = shownPlaces.length > 0;
+  locIn.removeAttribute("aria-activedescendant");
+  suggEl.hidden = false;
+  locIn.setAttribute("aria-expanded","true");
+}
+/* Any edit un-chooses, even one that restores the same text. */
+locIn.addEventListener("input", e=>{ draft.place = null; $("#wxhint").textContent = ""; syncPlaceState(); showSugg(e.target.value); });
+locIn.addEventListener("focus", ()=>{ if(!draft.place) showSugg(locIn.value); });
+locIn.addEventListener("blur", closeSugg);
+locIn.addEventListener("keydown", e=>{
+  if(e.key==="Escape"){ closeSugg(); return; }
+  if(e.key==="Enter"){ e.preventDefault(); if(hl>-1 && shownPlaces[hl]) setPlace(shownPlaces[hl]); return; }
+  if(e.key!=="ArrowDown" && e.key!=="ArrowUp") return;
+  e.preventDefault();
+  if(suggEl.hidden) showSugg(locIn.value);
+  if(!shownPlaces.length) return;
+  setHighlight(e.key==="ArrowDown" ? Math.min(hl+1, shownPlaces.length-1) : Math.max(hl-1, 0));
+});
+/* mousedown would blur the input and close the list before the click lands */
+suggEl.addEventListener("mousedown", e=>e.preventDefault());
+suggEl.addEventListener("click", e=>{
+  const b = e.target.closest("[data-place]"); if(!b) return;
+  setPlace(PLACES.find(p=>p.name === b.dataset.place));
+});
+
+function newDraft(){
+  /* kept: per sub-event name, the state that must survive rebuilds (owned flags, note, formality) */
+  return { subs: [], kept: {}, addons: [...DEFAULT_ADDONS], place: null, editing: null };
+}
+function pressed(sel){ const el=document.querySelector(sel+' [aria-pressed="true"]'); return el?el.textContent.trim():""; }
+
+/* Step 2 sets formality (and, when editing, what she is looking for) for the events chosen on step 1. */
+function buildSubs(){
+  const plan = currentPlan();
+  const names = plan ? plan.order.filter(n=>n===plan.central || draft.addons.includes(n)) : [pressed("#kind")];
+  draft.subs = names.map(n=>{
+    const k = draft.kept[n] || (draft.kept[n] = {dc:null, have:emptyHave(), note:""});
+    return { nm:n, dc: k.dc || DEFAULT_BY_NAME[n] || DEFAULT_FORMALITY, have:k.have, note:k.note };
+  });
+}
+function renderSubs(){
+  $("#subevs").innerHTML = draft.subs.map((s,i)=>`
+    <div class="subev">
+      <div class="nm">${s.nm}</div>
+      <div class="chips" data-sub="${i}">
+        ${CODES.map(c=>`<button class="chip" aria-pressed="${c===s.dc}">${c}</button>`).join("")}
+      </div>
+      ${draft.editing ? `<div class="mini" id="need-${i}">Looking for</div>
+      <div class="chips" role="group" aria-labelledby="need-${i}" data-need="${i}">
+        ${CATS.map(c=>`<button class="chip" data-k="${c.k}" aria-pressed="${!s.have[c.k]}">${c.n}</button>`).join("")}
+      </div>` : ""}
+    </div>`).join("");
+}
+$("#subevs").addEventListener("click", e=>{
+  const c = e.target.closest(".chip"); if(!c) return;
+  const needGroup = c.closest("[data-need]");
+  if(needGroup){
+    const s = draft.subs[+needGroup.dataset.need];
+    s.have[c.dataset.k] = !s.have[c.dataset.k];
+  } else {
+    const s = draft.subs[+c.closest("[data-sub]").dataset.sub];
+    s.dc = c.textContent.trim();
+    draft.kept[s.nm].dc = s.dc;
+  }
+  renderSubs();
+});
+
+function setEditMode(on){
+  const form = $("#s-add");
+  if(on) form.setAttribute("data-testid","edit-form"); else form.removeAttribute("data-testid");
+  $("#addTitle").textContent = on ? "Edit event" : "Add event";
+  $("#kind").hidden = on;
+  $("#kindFixed").hidden = !on;
+  $("#kindNote").hidden = !on;
+  $("#s1-h").textContent = on ? "Change the details" : "What are you going to?";
+}
+$("#addEv").addEventListener("click", ()=>{
+  draft = newDraft();
+  step = 1;
+  setEditMode(false);
+  setKind("Wedding");
+  $("#f-title").value = "";
+  $("#f-date").value = "";
+  syncDate();
+  locIn.value = "";
+  $("#wxhint").textContent = "";
+  closeSugg();
+  renderAddons();
+  showStep(); push("s-add");
+});
+function openEdit(){
+  const ev = curEv;
+  draft = newDraft();
+  draft.editing = ev;
+  step = 1;
+  setEditMode(true);
+  setKind(ev.kind);
+  $("#kindFixed").textContent = ev.kind;
+  ev.subs.forEach(s=>{ draft.kept[s.nm] = {dc:s.dc, have:{...s.have}, note:s.note}; });
+  draft.addons = Object.values(EVENT_PLANS).flatMap(p=>p.order).filter(a=>draft.kept[a]);
+  draft.place = PLACES.find(p=>p.name===ev.loc) || {name:ev.loc};  /* the saved place counts as chosen */
+  $("#f-title").value = ev.title;
+  $("#f-date").value = ev.date;
+  syncDate();
+  locIn.value = ev.loc;
+  closeSugg();
+  showForecast(draft.place);
+  renderAddons();
+  showStep(); push("s-add");
+}
+const NEXT_ARROW = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 3.5L13.5 8 9 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function showStep(){
+  document.querySelectorAll(".step").forEach(el=> el.hidden = +el.dataset.step !== step);
+  $("#stepN").textContent = `Step ${step} of ${LAST_STEP}`;
+  $("#next").innerHTML = step===LAST_STEP ? (draft.editing ? "Save changes" : "Save event") : `Continue ${NEXT_ARROW}`;
+  $("#addScroll").scrollTop = 0;
+  closeSugg();
+  syncPlaceState();
+  if(step===2){ buildSubs(); renderSubs(); }
+}
+function formValues(){
+  return {
+    title: $("#f-title").value.trim() || pressed("#kind"),
+    kind: pressed("#kind"),
+    date: $("#f-date").value,
+    loc: draft.place.name,
+    subs: draft.subs.map(s=>({ nm:s.nm, dc:s.dc, have:s.have, note:s.note }))
+  };
+}
+$("#next").addEventListener("click", ()=>{
+  if(step<LAST_STEP){ step++; showStep(); return; }
+  const v = formValues();
+  if(draft.editing){
+    Object.assign(draft.editing, v);
+    renderHome();
+    stack.length = 1;  /* the event screen may change kind (one sub-event <-> several), so route afresh */
+    openEvent(draft.editing);
+    toast("Changes saved");
+    return;
+  }
+  events.unshift({ id: Date.now(), ...v });
+  renderHome();
+  navigate(()=>{ stack.length = 1; paint(); }, "back");
+  toast("Event added");
+});
+$("#addBack").addEventListener("click", ()=>{ if(step>1){ step--; showStep(); } else pop(); });
+
+/* ---------- shopping screen ---------- */
+/* One sub-event goes straight into its feed; several get the sectioned shopping screen. */
+function openEvent(ev){
+  curEv = ev;
+  if(ev.subs.length===1){
+    renderGap(ev.subs[0]);
+    push("s-gap");
+  } else {
+    renderShop(); resetShopScroll();
+    push("s-shop");
+  }
+}
+function resetShopScroll(){
+  $("#shopScroll").scrollTop = 0;
+  showShopPencil(true);
+}
+function renderHeaderName(){
+  $("#s-shop .shopTitle").textContent = eventName(curEv);
+}
+/* One live event-subtitle at a time: the screen being rendered claims the test id, so the page never holds two. */
+function claimSubtitle(id){
+  ["#e-meta","#g-meta"].forEach(sel=>{ if(sel===id) $(sel).setAttribute("data-testid","event-subtitle"); else $(sel).removeAttribute("data-testid"); });
+}
+function renderShop(){
+  claimSubtitle("#e-meta");
+  renderHeaderName();
+  $("#e-meta").textContent = `${prettyDate(curEv.date)} · ${curEv.loc}`;
+  renderFilterBtn();
+  /* central event first; the rest keep their chronological order */
+  const order = curEv.subs.map((s,i)=>i).sort((a,b)=>
+    CENTRAL_NAMES.includes(curEv.subs[b].nm) - CENTRAL_NAMES.includes(curEv.subs[a].nm));
+  $("#sections").innerHTML = order.map(sectionHTML).join("");
+}
+const ARROW_SVG = '<svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 3.5L13.5 8 9 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function sectionHTML(i){
+  const sub = curEv.subs[i];
+  const cards = railCards(sub, filtersFor(curEv));
+  let body;
+  if(!needed(sub).length){
+    body = `<div class="empty"><div class="ttl">You have everything for this one</div><p>Open it to change what you're looking for.</p></div>`;
+  } else if(!cards.length){
+    body = `<div class="none" data-testid="empty-results">Nothing matches your filters.<button data-testid="empty-clear" data-clear-filters>Clear filters</button></div>`;
+  } else {
+    body = `<div class="rail" tabindex="0" role="group" aria-label="${sub.nm} options, scroll sideways"><div class="railRow" data-testid="rail">${cards.map(cardHTML).join("")}</div></div>`;
+  }
+  return `<section class="shopSec" data-testid="shop-section" data-sub="${sub.nm}">
+    <div class="secHd">
+      <div class="secT"><h2>${sub.nm}</h2><div class="fm">${sub.dc}</div></div>
+      <button class="arrowBtn" data-testid="section-arrow" data-open="${i}" aria-label="Open ${sub.nm} shopping">${ARROW_SVG}</button>
+    </div>
+    ${body}
+  </section>`;
+}
+$("#sections").addEventListener("click", e=>{
+  const b = e.target.closest("[data-open]"); if(!b) return;
+  renderGap(curEv.subs[+b.dataset.open]);
+  push("s-gap");
+});
+$("#shopBack").addEventListener("click", pop);
+$("#pencil").addEventListener("click", openEdit);
+/* Each edit pencil hides on the way down and returns on the way up. Returns the function that shows or hides it. */
+function hidePencilOnScroll(scroller, pencil){
+  let lastTop = 0;
+  const show = shown => {
+    pencil.classList.toggle("gone", !shown);
+    pencil.inert = !shown;
+    pencil.setAttribute("aria-hidden", String(!shown));
+  };
+  scroller.addEventListener("scroll", ()=>{
+    const top = scroller.scrollTop;
+    if(top <= SCROLL_HIDE_AFTER || top < lastTop - SCROLL_NOISE) show(true);
+    else if(top > lastTop + SCROLL_NOISE) show(false);
+    lastTop = top;
+  }, {passive:true});
+  return show;
+}
+const showShopPencil = hidePencilOnScroll($("#shopScroll"), $("#pencil"));
+const showGapPencil = hidePencilOnScroll($("#gapScroll"), $("#gapPencil"));
+$("#gapPencil").addEventListener("click", openEdit);
+
+/* ---------- rail composition ---------- */
+function hash(str){ let h = 0; for(const ch of str) h = (h*31 + ch.charCodeAt(0)) | 0; return h; }
+/* Largest-remainder split of RAIL_CARDS across the needed elements, at least one of each non-dress
+   element, then capped by what the catalogue can supply (spare cards go to the heaviest element with room). */
+function splitCards(keys, supply){
+  const total = keys.reduce((n,k)=>n+RAIL_WEIGHTS[k],0);
+  const raw = keys.map(k=>RAIL_CARDS*RAIL_WEIGHTS[k]/total);
+  const counts = raw.map(Math.floor);
+  let left = RAIL_CARDS - counts.reduce((a,b)=>a+b,0);
+  keys.map((k,i)=>i).sort((a,b)=>(raw[b]-counts[b])-(raw[a]-counts[a]) || RAIL_WEIGHTS[keys[b]]-RAIL_WEIGHTS[keys[a]])
+    .forEach(i=>{ if(left>0){ counts[i]++; left--; } });
+  keys.forEach((k,i)=>{
+    if(k!=="dress" && counts[i]<1){
+      counts[i] = 1;
+      counts[counts.indexOf(Math.max(...counts))]--;
+    }
+  });
+  let spare = 0;
+  counts.forEach((n,i)=>{ const cap = supply[keys[i]]; if(n>cap){ spare += n-cap; counts[i] = cap; } });
+  const byWeight = keys.map((k,i)=>i).sort((a,b)=>RAIL_WEIGHTS[keys[b]]-RAIL_WEIGHTS[keys[a]]);
+  while(spare>0){
+    const room = byWeight.find(i=>counts[i]<supply[keys[i]]);
+    if(room===undefined) break;
+    counts[room]++; spare--;
+  }
+  return Object.fromEntries(keys.map((k,i)=>[k,counts[i]]));
+}
+function formalityGap(p, dc){
+  const r = FORMALITY_RANK[dc];
+  return Math.min(...p.fits.map(f=>Math.abs(f-r)));
+}
+/* Closest formality first, then followed curators, then a stable per-section shuffle so two sections
+   with the same formality do not show the same cards. */
+function rankFor(cat, sub){
+  return PRODUCTS.map((p,i)=>({p, key:hash(`${sub.nm}|${i}`)})).filter(x=>x.p.cat===cat)
+    .sort((a,b)=>formalityGap(a.p,sub.dc)-formalityGap(b.p,sub.dc) || b.p.followed-a.p.followed || a.key-b.key)
+    .map(x=>x.p);
+}
+function passesFilters(p, f){
+  const inPrice = !f.prices.length || PRICE_RANGES.some(r=>f.prices.includes(r.k) && p.priceNum>=r.min && p.priceNum<=r.max);
+  return inPrice && (!f.colors.length || f.colors.includes(p.color));
+}
+/* The one place a section's mix is decided. Excluded = owned or not needed, plus any component the shopper
+   hid in the filter sheet; the 80/10/5/5 weights renormalise over what is left. Price and colour thin the
+   candidate pool first. Components with nothing left to show drop out rather than hold back their share. */
+function railCards(sub, f){
+  const excluded = new Set([...CATS.filter(c=>sub.have[c.k]).map(c=>c.k), ...f.hidden]);
+  const ranked = {};
+  CATS.forEach(c=>{
+    if(excluded.has(c.k)) return;
+    const pool = rankFor(c.k, sub).filter(p=>passesFilters(p, f));
+    if(pool.length) ranked[c.k] = pool;
+  });
+  const keys = Object.keys(ranked);
+  if(!keys.length) return [];
+  const supply = Object.fromEntries(keys.map(k=>[k, ranked[k].length]));
+  const counts = splitCards(keys, supply);
+  /* spread each element evenly along the sequence so dresses lead and the rest are sprinkled in */
+  const seq = [];
+  keys.forEach(k=>{
+    const picked = ranked[k].slice(0, counts[k]).sort((a,b)=>b.followed-a.followed);
+    picked.forEach((p,i)=>seq.push({p, pos:(i+.5)/picked.length, w:RAIL_WEIGHTS[k]}));
+  });
+  seq.sort((a,b)=>a.pos-b.pos || b.w-a.w);
+  const cards = seq.map(x=>x.p);
+  /* Price sort orders the whole section's single row. */
+  if(f.sort==="price-asc") cards.sort((a,b)=>a.priceNum-b.priceNum);
+  else if(f.sort==="price-desc") cards.sort((a,b)=>b.priceNum-a.priceNum);
+  return cards;
+}
+
+/* ---------- filter and sort ---------- */
+/* Kept in memory per event id; nothing here touches the "have it" flags. */
+const filtersById = {};
+const newFilters = () => ({hidden:[], prices:[], colors:[], sort:DEFAULT_SORT});
+function filtersFor(ev){ return filtersById[ev.id] || (filtersById[ev.id] = newFilters()); }
+function filterCount(f){ return f.hidden.length + f.prices.length + f.colors.length + (f.sort!==DEFAULT_SORT ? 1 : 0); }
+function toggleIn(list, k){ const i = list.indexOf(k); if(i>-1) list.splice(i,1); else list.push(k); }
+
+function renderFilterBtn(){
+  const n = filterCount(filtersFor(curEv));
+  document.querySelectorAll('[data-testid="filter-button"]').forEach(btn=>{
+    const badge = btn.querySelector(".fcount");
+    badge.hidden = !n; badge.textContent = n;
+    if(n) btn.dataset.count = n; else btn.removeAttribute("data-count");
+  });
+}
+/* Elements the open sub-event already owns; only the feed has a single sub-event to ask. */
+function ownedHere(){ return stack[stack.length-1]==="s-gap" ? CATS.filter(c=>curSub.have[c.k]).map(c=>c.k) : []; }
+function renderFilterSheet(){
+  const f = filtersFor(curEv);
+  const owned = ownedHere();
+  $("#fg-show").innerHTML = CATS.map(c=> owned.includes(c.k)
+    ? `<button class="fchip" data-testid="filter-component" data-cat="${c.k}" data-owned="true" aria-pressed="false" aria-disabled="true">${SHOW_LABELS[c.k]}<span class="own">have it</span></button>`
+    : `<button class="fchip" data-testid="filter-component" data-cat="${c.k}" aria-pressed="${!f.hidden.includes(c.k)}">${SHOW_LABELS[c.k]}</button>`).join("");
+  $("#fg-price").innerHTML = PRICE_RANGES.map(r=>
+    `<button class="fchip" data-testid="filter-price" data-range="${r.k}" aria-pressed="${f.prices.includes(r.k)}">${r.label}</button>`).join("");
+  $("#fg-color").innerHTML = COLORS.map(c=>
+    `<button class="fchip" data-testid="filter-color" data-color="${c.k}" aria-pressed="${f.colors.includes(c.k)}"><span class="dot" style="background:${c.hex}"></span>${c.n}</button>`).join("");
+  $("#fg-sort").innerHTML = SORT_OPTIONS.map(o=>
+    `<button class="fchip" role="radio" data-testid="sort-option" data-sort="${o.k}" aria-checked="${f.sort===o.k}">${o.label}</button>`).join("");
+}
+/* Rails or feed update live behind the sheet. Only the screen in front re-renders; the shopping screen
+   catches up when the feed goes back. It keeps its scroll position, the feed starts over. */
+function renderShopKeepScroll(){
+  const top = $("#shopScroll").scrollTop;
+  renderShop();
+  $("#shopScroll").scrollTop = top;
+}
+function applyFilters(){
+  if(stack[stack.length-1]==="s-gap"){ renderFilterBtn(); renderFeed(); $("#gapScroll").scrollTop = 0; }
+  else renderShopKeepScroll();
+  renderFilterSheet();
+}
+function clearFilters(){ filtersById[curEv.id] = newFilters(); applyFilters(); }
+
+const fSheet = $("#fsheet"), fBack = $("#fsBack");
+let sheetOpen = false, sheetOpener = null;
+function setBackgroundInert(on){ document.querySelectorAll(".screen").forEach(el=>{ el.inert = on; }); }
+function openFilterSheet(e){
+  sheetOpener = e.currentTarget;
+  renderFilterSheet();
+  sheetOpen = true;
+  setBackgroundInert(true);
+  fBack.classList.add("open"); fSheet.classList.add("open");
+  fSheet.focus({preventScroll:true});
+}
+function closeFilterSheet(){
+  if(!sheetOpen) return;
+  sheetOpen = false;
+  fSheet.classList.remove("open"); fBack.classList.remove("open"); fSheet.style.transform = "";
+  setBackgroundInert(false);
+  sheetOpener.focus({preventScroll:true});
+}
+$("#filterBtn").addEventListener("click", openFilterSheet);
+$("#gapFilterBtn").addEventListener("click", openFilterSheet);
+$("#fsClose").addEventListener("click", closeFilterSheet);
+$("#fsApply").addEventListener("click", closeFilterSheet);
+$("#fsClear").addEventListener("click", clearFilters);
+fBack.addEventListener("click", closeFilterSheet);
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeFilterSheet(); });
+fSheet.addEventListener("click", e=>{
+  const b = e.target.closest("[data-testid]"); if(!b) return;
+  const f = filtersFor(curEv), t = b.dataset.testid;
+  if(t==="filter-component"){ if(b.dataset.owned) return; toggleIn(f.hidden, b.dataset.cat); }
+  else if(t==="filter-price") toggleIn(f.prices, b.dataset.range);
+  else if(t==="filter-color") toggleIn(f.colors, b.dataset.color);
+  else if(t==="sort-option") f.sort = b.dataset.sort;
+  else return;
+  const at = [...fSheet.querySelectorAll("[data-testid]")].indexOf(b);
+  applyFilters();
+  fSheet.querySelectorAll("[data-testid]")[at].focus({preventScroll:true});  /* the chips were re-rendered; keep focus on the same one */
+});
+$("#sections").addEventListener("click", e=>{
+  if(!e.target.closest("[data-clear-filters]")) return;
+  clearFilters();
+  $("#filterBtn").focus({preventScroll:true});
+});
+
+/* Drag the handle down to dismiss. */
+let dragY0 = null;
+$("#fsGrab").addEventListener("pointerdown", e=>{
+  if(e.target.closest("button")) return;
+  dragY0 = e.clientY; fSheet.classList.add("drag"); e.currentTarget.setPointerCapture(e.pointerId);
+});
+$("#fsGrab").addEventListener("pointermove", e=>{
+  if(dragY0===null) return;
+  fSheet.style.transform = `translateY(${Math.max(0, e.clientY-dragY0)}px)`;
+});
+$("#fsGrab").addEventListener("pointerup", e=>{
+  if(dragY0===null) return;
+  const dy = e.clientY - dragY0; dragY0 = null;
+  fSheet.classList.remove("drag");
+  if(dy > DISMISS_DRAG_PX) closeFilterSheet(); else fSheet.style.transform = "";
+});
+$("#fsGrab").addEventListener("pointercancel", ()=>{ dragY0 = null; fSheet.classList.remove("drag"); fSheet.style.transform = ""; });
+
+/* ---------- sub-event feed ---------- */
+/* A feed under a several-sub-event event has a back-only top bar and the sub-event's name as its title; the event
+   name appears nowhere. An event's only sub-event gets the event title and the pencil. */
+function renderGap(sub){
+  curSub = sub;
+  claimSubtitle("#g-meta");
+  const solo = curEv.subs.length===1;
+  $("#g-event").hidden = !solo;
+  $("#g-event").textContent = solo ? eventName(curEv) : "";
+  $("#g-name").hidden = solo;
+  $("#g-name").textContent = solo ? "" : sub.nm;
+  $("#gapPencil").hidden = !solo;
+  showGapPencil(true);
+  $("#g-meta").textContent = `${prettyDate(curEv.date)} · ${curEv.loc}`;
+  $("#g-wx").innerHTML = weatherHTML(placeWx(curEv.loc));
+  $("#g-dc").textContent = sub.dc;
+  renderFeed();
+  $("#gapScroll").scrollTop = 0;
+}
+$("#gapBack").addEventListener("click", ()=>{
+  if(stack[stack.length-2]==="s-shop") renderShopKeepScroll();
+  pop();
+});
+
+/* Smooth weighted round-robin over the element types: dresses lead, the rest are sprinkled at their
+   weight, and a type that runs out simply drops from the rotation. */
+function interleave(lists){
+  const keys = Object.keys(lists), credit = Object.fromEntries(keys.map(k=>[k,0])), at = Object.fromEntries(keys.map(k=>[k,0]));
+  const out = [];
+  for(;;){
+    const live = keys.filter(k=>at[k]<lists[k].length);
+    if(!live.length) return out;
+    const total = live.reduce((n,k)=>n+RAIL_WEIGHTS[k],0);
+    live.forEach(k=>{ credit[k] += RAIL_WEIGHTS[k]; });
+    const pick = live.reduce((best,k)=> credit[k]>credit[best] ? k : best);
+    credit[pick] -= total;
+    out.push(lists[pick][at[pick]++]);
+  }
+}
+/* Everything the shopper can still buy for this sub-event, in feed order. Owned elements are out whatever
+   the Show chips say. Recommended: followed curators first, then the rest, each group interleaved with the
+   closest formality first. Price sorts flatten both groups so the order holds across every batch. */
+function feedEntries(sub, f){
+  const pools = Object.fromEntries(CATS.map(c=>c.k).filter(k=>!sub.have[k] && !f.hidden.includes(k))
+    .map(k=>[k, rankFor(k, sub).filter(p=>passesFilters(p, f))]));
+  if(f.sort!==DEFAULT_SORT){
+    const dir = f.sort==="price-asc" ? 1 : -1;
+    return Object.values(pools).flat().sort((a,b)=>dir*(a.priceNum-b.priceNum)).map(p=>({p}));
+  }
+  return [true,false].flatMap(followed=>{
+    const cards = interleave(Object.fromEntries(Object.entries(pools).map(([k,list])=>[k, list.filter(p=>p.followed===followed)])));
+    if(!cards.length) return [];
+    const names = [...new Set(cards.map(p=>p.by))].join(", ");
+    return [followed ? {title:"From curators you follow", group:"followed", names}
+                     : {title:`More for ${sub.dc.toLowerCase()}`, group:"more"}, ...cards.map(p=>({p}))];
+  });
+}
+let feed = null;
+function groupHTML(g){
+  return `<div class="fgHead" data-testid="feed-group" data-group="${g.group}"><span class="fgT">${esc(g.title)}</span> ${g.names ? `<span class="fgN">${esc(g.names)}</span>` : ""}</div>`;
+}
+/* Append the next batch in place. A group header only ever precedes a card, so it is never stranded at a batch edge. */
+function loadBatch(){
+  let html = "", cards = 0;
+  while(cards<FEED_BATCH && feed.next<feed.entries.length){
+    const e = feed.entries[feed.next++];
+    if(e.p){ html += cardHTML(e.p); cards++; } else html += groupHTML(e);
+  }
+  const grid = $("#g-feed");
+  if(feed.next>=feed.entries.length){
+    grid.insertAdjacentHTML("beforeend", html + `<p class="feedEnd" data-testid="feed-end">That's everything for now.</p>`);
+    feed.io.disconnect();
+  } else {
+    grid.insertAdjacentHTML("beforeend", html);
+    feed.io.unobserve($("#g-sentinel")); feed.io.observe($("#g-sentinel"));  /* re-observe so a still-visible sentinel fires again */
+  }
+}
+function renderFeed(){
+  if(feed) feed.io.disconnect();
+  const grid = $("#g-feed"), entries = feedEntries(curSub, filtersFor(curEv));
+  feed = null;
+  if(!entries.length){
+    grid.innerHTML = needed(curSub).length
+      ? `<div class="none" data-testid="empty-results">Nothing matches your filters.<button data-testid="empty-clear" data-clear-filters>Clear filters</button></div>`
+      : `<div class="empty"><div class="ttl">You have everything for this one</div><p>Open it from the shopping screen to change what you're looking for.</p></div>`;
+    return;
+  }
+  grid.innerHTML = "";
+  feed = {entries, next:0, io:new IntersectionObserver(hits=>{ if(hits.some(h=>h.isIntersecting)) loadBatch(); },
+    {root:$("#gapScroll"), rootMargin:`0px 0px ${FEED_PRELOAD_PX}px 0px`})};
+  loadBatch();
+}
+$("#g-feed").addEventListener("click", e=>{
+  if(!e.target.closest("[data-clear-filters]")) return;
+  clearFilters();
+  $("#gapFilterBtn").focus({preventScroll:true});
+});
+
+const iconHTML = p => `<span class="pic" style="--t:${p.tint}"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#pi-${p.cat}"/></svg></span>`;
+/* A product without a photo shows its category icon in a tone from its own tint, so the colour filters still read. */
+function artHTML(p){
+  return p.img ? `<img src="${esc(p.img)}" alt="${esc(`${p.brand} ${p.name}`)}" loading="lazy">` : iconHTML(p);
+}
+/* A photo that fails to load falls back to the icon. error does not bubble, so listen in capture. */
+document.addEventListener("error", e=>{
+  const img = e.target;
+  if(!(img instanceof HTMLImageElement) || !img.closest(".card .tile")) return;
+  const p = PRODUCTS.find(x=>x.img===img.getAttribute("src"));
+  if(p) img.outerHTML = iconHTML(p);
+}, true);
+const PLUS_ICON = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><path d="M10 2.5v15M2.5 10h15"/></svg>';
+/* The card is a div: the product button (tile, brand, name, price) and the "+" are siblings, so neither nests in the other. */
+function cardHTML(p){
+  return `<div class="card" data-testid="product-card" data-id="${p.id}" data-cat="${p.cat}" data-price="${p.priceNum}" data-color="${p.color}" data-followed="${p.followed}">
+    <button class="cardBody">
+      <span class="tile">${artHTML(p)}</span>
+      <span class="cap"><span class="br">${p.brand}</span><span class="nm">${p.name}</span><span class="pr">${p.price}</span></span>
+    </button>
+    <span class="addSlot"><button class="cardAdd" data-testid="card-add" aria-label="Add to a list">${PLUS_ICON}</button></span>
+  </div>`;
+}
+
+/* ---------- misc ---------- */
+let tt;
+function toast(m){ const el=$("#toast"); el.textContent=m; el.classList.add("on"); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove("on"),1700); }
+document.addEventListener("click", e=>{
+  if(e.target.closest(".cardAdd")) toast(ADD_TO_LIST_TOAST);
+  else if(e.target.closest(".cardBody")) toast(RETAILER_TOAST);
+});
+
+draft = newDraft();
+renderAddons(); renderHome(); paint();
+</script>
+</body>
+</html>
