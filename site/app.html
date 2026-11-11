@@ -285,16 +285,20 @@ if (window.self !== window.top) document.documentElement.classList.add('in-frame
   .navPill{flex:1;min-width:0;height:58px;padding:0 7px;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;
     background:rgba(246,244,242,.72);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
     border:1px solid rgba(255,255,255,.7);border-radius:999px;box-shadow:0 2px 18px rgba(0,0,0,.08)}
-  .navBtn{height:44px;display:grid;place-items:center;border-radius:999px;color:var(--ink);opacity:.8}
+  .navBtn{width:100%;height:44px;padding:0;display:grid;place-items:center;border-radius:999px;color:var(--ink);opacity:.8}
+  button.navBtn:active{background:rgba(255,255,255,.78)}
   .navBtn.on{opacity:1;background:rgba(255,255,255,.78);box-shadow:inset 0 0 0 1px rgba(0,0,0,.04),0 1px 4px rgba(0,0,0,.05)}
-  .navSearch{width:58px;height:58px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;color:var(--ink);
+  .navSearch{width:58px;height:58px;padding:0;flex-shrink:0;border-radius:50%;display:grid;place-items:center;color:var(--ink);
     background:rgba(246,244,242,.72);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
     border:1px solid rgba(255,255,255,.7);box-shadow:0 2px 18px rgba(0,0,0,.08)}
 
-  .toast{position:absolute;left:50%;bottom:88px;transform:translate(-50%,8px);background:var(--ink);color:#fff;
+  .toast{position:absolute;left:50%;bottom:88px;transform:translate(-50%,8px);background:#E9E6E2;color:var(--ink);
     font-size:12.5px;padding:10px 16px;border-radius:18px;opacity:0;pointer-events:none;
     transition:opacity .2s,transform .2s;z-index:40;max-width:calc(100% - 28px);text-align:center;line-height:1.35}
   .toast.on{opacity:1;transform:translate(-50%,0)}
+  /* On My Events the toast clears "Add an event": nav offset + nav height + gap + button height + 12px */
+  .app:has(#s-home[data-s="on"]) .toast{bottom:calc(12px + 58px + 12px + 52px + 12px + env(safe-area-inset-bottom,0px));
+    width:max-content;max-width:min(300px,calc(100% - 28px));text-wrap:balance}
 </style>
 </head>
 <body>
@@ -319,12 +323,12 @@ if (window.self !== window.top) document.documentElement.classList.add('in-frame
     <button class="addbtn" id="addEv"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Add an event</button>
     <div class="nav">
       <div class="navPill">
-        <span class="navBtn" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg></span>
-        <span class="navBtn" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-7-9.3A4.2 4.2 0 0112 7a4.2 4.2 0 017 3.7C19 15.4 12 20 12 20z"/></svg></span>
-        <span class="navBtn" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="4" rx="1"/><path d="M5 13v6.5a1 1 0 001 1h12a1 1 0 001-1V13M12 9v11.5M12 9C10 9 8 8 8 6.5S9.3 4.5 10.5 5 12 7.5 12 9zm0 0c2 0 4-1 4-2.5s-1.3-2-2.5-1.5S12 7.5 12 9z"/></svg></span>
+        <button class="navBtn" aria-label="Home"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg></button>
+        <button class="navBtn" aria-label="Saved"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-7-9.3A4.2 4.2 0 0112 7a4.2 4.2 0 017 3.7C19 15.4 12 20 12 20z"/></svg></button>
+        <button class="navBtn" aria-label="Gifts"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="4" rx="1"/><path d="M5 13v6.5a1 1 0 001 1h12a1 1 0 001-1V13M12 9v11.5M12 9C10 9 8 8 8 6.5S9.3 4.5 10.5 5 12 7.5 12 9zm0 0c2 0 4-1 4-2.5s-1.3-2-2.5-1.5S12 7.5 12 9z"/></svg></button>
         <span class="navBtn on" role="img" aria-label="My Events, current page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
       </div>
-      <span class="navSearch" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span>
+      <button class="navSearch" aria-label="Search"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
     </div>
   </section>
 
@@ -457,7 +461,7 @@ if (window.self !== window.top) document.documentElement.classList.add('in-frame
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 </div>
 
@@ -691,6 +695,7 @@ const NO_DATE = {year:"TBD", month:"TBD", day:"\u2013", countdown:"Date TBD"};
 const SCROLL_HIDE_AFTER = 24, SCROLL_NOISE = 4;
 const RETAILER_TOAST = "Opens on the retailer’s site in the real product.";
 const ADD_TO_LIST_TOAST = "Prompted to ‘Add to a list’";
+const NAV_TOAST = "The rest of ShopMy lives here. In this concept, only My Events works.";
 
 const pad2 = n => String(n).padStart(2, "0");
 const emptyHave = () => ({dress:false, shoes:false, bag:false, accessory:false});
@@ -1453,10 +1458,12 @@ function cardHTML(p){
 
 /* ---------- misc ---------- */
 let tt;
-function toast(m){ const el=$("#toast"); el.textContent=m; el.classList.add("on"); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove("on"),1700); }
+const TOAST_MS = 1700, LONG_TOAST_MS = 3800;
+function toast(m, ms = TOAST_MS){ const el=$("#toast"); el.textContent=m; el.classList.add("on"); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove("on"),ms); }
 document.addEventListener("click", e=>{
   if(e.target.closest(".cardAdd")) toast(ADD_TO_LIST_TOAST);
   else if(e.target.closest(".cardBody")) toast(RETAILER_TOAST);
+  else if(e.target.closest("button.navBtn, button.navSearch")) toast(NAV_TOAST, LONG_TOAST_MS);
 });
 
 draft = newDraft();
