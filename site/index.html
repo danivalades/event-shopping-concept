@@ -176,6 +176,15 @@
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
   :focus-visible{outline:2px solid var(--sage);outline-offset:3px;border-radius:3px}
 </style>
+<!-- Vercel Web Analytics: page views per path, no cookies. Each recipient gets a 10-character link (see vercel.json). -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  /* Only on the live site; the script does not exist on a local server. */
+  if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+    var va = document.createElement('script'); va.defer = true; va.src = '/_vercel/insights/script.js';
+    document.head.appendChild(va);
+  }
+</script>
 </head>
 <body>
 
